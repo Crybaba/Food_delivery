@@ -1,0 +1,62 @@
+[
+    {
+        "model": "orders.orderstatus",
+        "pk": 1,
+        "fields": {
+            "name": "Новый",
+            "description": "Заказ только что создан",
+            "is_final": false,
+            "color": "#007bff"
+        }
+    },
+    {
+        "model": "orders.orderstatus",
+        "pk": 2,
+        "fields": {
+            "name": "В обработке",
+            "description": "Заказ принят и обрабатывается",
+            "is_final": false,
+            "color": "#ffc107"
+        }
+    },
+    {
+        "model": "orders.orderstatus",
+        "pk": 3,
+        "fields": {
+            "name": "Готовится",
+            "description": "Заказ готовится",
+            "is_final": false,
+            "color": "#17a2b8"
+        }
+    },
+    {
+        "model": "orders.orderstatus",
+        "pk": 4,
+        "fields": {
+            "name": "В пути",
+            "description": "Заказ в пути к клиенту",
+            "is_final": false,
+            "color": "#6f42c1"
+        }
+    },
+    {
+        "model": "orders.orderstatus",
+        "pk": 5,
+        "fields": {
+            "name": "Доставлен",
+            "description": "Заказ успешно доставлен",
+            "is_final": true,
+            "color": "#28a745"
+        }
+    },
+    {
+        "model": "orders.orderstatus",
+        "pk": 6,
+        "fields": {
+            "name": "Отменен",
+            "description": "Заказ отменен",
+            "is_final": true,
+            "color": "#dc3545"
+        }
+    }
+]
