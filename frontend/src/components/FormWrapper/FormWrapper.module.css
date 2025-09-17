@@ -1,0 +1,26 @@
+.form {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.form-card {
+  padding: 20px;
+  border: 2px dotted var(--color-border);
+  background: var(--color-bg-muted);
+  border-radius: var(--radius-sm);
+  width: 420px;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.form-legend {
+  font-size: 14px;
+  color: var(--color-muted);
+  margin-top: 10px;
+}

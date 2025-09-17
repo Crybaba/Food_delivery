@@ -1,0 +1,59 @@
+.input {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+}
+
+.short { width: 90px; }
+.medium { width: 150px; }
+.long { width: 225px; }
+.phone { width: 140px; }
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* расстояние между label и input */
+}
+
+.label {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink);
+  min-width: 125px; /* чтобы все лейблы были ровные */
+  text-align: right; /* выравнивание текста справа */
+}
+
+.phone-prefix {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink);
+  user-select: none;
+  margin-right: 4px;
+}
+
+.input-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.required-indicator {
+  position: absolute;
+  top: 50%;
+  right: 8px; 
+  transform: translateY(-50%);
+  color: var(--color-orange);
+  font-weight: bold;
+  pointer-events: none;
+}

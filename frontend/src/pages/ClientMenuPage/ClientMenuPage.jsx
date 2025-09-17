@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../components/Layout';
-import { fetchDishes } from '../lib/api';
-import { useCart } from '../context/CartContext';
+import Layout from '../../components/Layout/Layout';
+import { fetchDishes } from '../../lib/api';
+import { useCart } from '../../context/CartContext';
 
 export default function ClientMenuPage() {
   const [data, setData] = useState({ results: [], count: 0 });

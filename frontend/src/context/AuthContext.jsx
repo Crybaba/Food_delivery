@@ -28,7 +28,24 @@ export const AuthProvider = ({ children }) => {
     } catch {}
   }, []);
 
-  const value = useMemo(() => ({ isAuthenticated, role, login, logout, setRole }), [isAuthenticated, role, login, logout]);
+  const register = useCallback((userData) => {
+    try {
+      const safeUser = {
+        surname: userData?.surname || '',
+        name: userData?.name || '',
+        patronymic: userData?.patronymic || '',
+        phone: userData?.phone || '',
+        gender: userData?.gender || '',
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('auth.registeredUser', JSON.stringify(safeUser));
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: 'failed_to_register' };
+    }
+  }, []);
+
+  const value = useMemo(() => ({ isAuthenticated, role, login, logout, register, setRole }), [isAuthenticated, role, login, logout, register]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

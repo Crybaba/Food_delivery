@@ -1,0 +1,30 @@
+.button {
+  width: 40vw;
+  max-width: 90vw;
+  height: 10vh;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  transition: transform 0.2s;
+}
+
+.button:hover {
+  transform: scale(1.03);
+}
+
+.icon {
+  font-size: 48px;
+}
+
+/* Цвета */
+.btn-orange { background-color: #ff7f00; }
+.btn-lightorange { background-color: #fd9e10; }
+.btn-yellow { background-color: #ffa500; }
+.btn-lightyellow { background-color: #ffb233; }

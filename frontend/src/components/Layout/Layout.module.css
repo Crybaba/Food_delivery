@@ -1,0 +1,15 @@
+.layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* header | content | footer */
+  min-height: 100vh;
+  background: var(--bg, #fff);
+  color: var(--text, #111);
+}
+
+.layout-main {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}

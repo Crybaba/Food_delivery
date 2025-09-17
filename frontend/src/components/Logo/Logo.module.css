@@ -1,0 +1,31 @@
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+}
+
+.textWrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brand-title {
+  color: var(--color-orange);
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: 0.2px;
+}
+
+.brand-sub {
+  font-size: 16px;
+  color: var(--color-muted);
+  font-weight: 600;
+  text-transform: lowercase;
+}

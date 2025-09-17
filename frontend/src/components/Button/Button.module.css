@@ -1,0 +1,58 @@
+.button {
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: filter var(--transition-fast);
+}
+
+.button:hover {
+  filter: brightness(1.05);
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Цвета */
+.btn-orange {
+  background: var(--color-orange);
+  color: var(--color-white);
+}
+
+.btn-blue {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.btn-muted {
+  background: var(--color-gray);
+  color: var(--color-white);
+}
+
+/* Размеры */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.btn-medium {
+  padding: 12px 20px;
+  font-size: 16px;
+}
+
+.btn-large {
+  padding: 16px 28px;
+  font-size: 20px;
+}
+
+/* Ширина */
+.btn-full {
+  width: 100%;
+}

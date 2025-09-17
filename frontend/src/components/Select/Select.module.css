@@ -1,0 +1,46 @@
+.select {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* расстояние между лейблом и селектом */
+}
+
+.label {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink);
+  min-width: 125px; /* чтобы все лейблы были ровные */
+  text-align: right;
+}
+
+.input-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.required-indicator {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  color: var(--color-orange);
+  font-weight: bold;
+  pointer-events: none;
+}
+
+/* размеры селекта, как у Input */
+.short { width: 90px; }
+.medium { width: 150px; }
+.long { width: 225px; }
+.phone { width: 140px; }

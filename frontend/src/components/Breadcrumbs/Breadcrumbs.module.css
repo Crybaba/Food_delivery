@@ -1,0 +1,30 @@
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--color-blue);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.item a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.item a:hover {
+  text-decoration: underline;
+}
+
+.current {
+  font-weight: 600;
+  color: #222;
+}
+
+.separator {
+  margin: 0 6px;
+  color: #aaa;
+}

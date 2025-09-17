@@ -1,6 +1,6 @@
 import React from 'react';
-import Layout from '../components/Layout';
-import OptionCard from '../components/OptionCard';
+import Layout from '../../components/Layout/Layout';
+import OptionCard from '../../components/OptionCard/OptionCard';
 import { ClipboardList, Truck, Utensils, BarChart2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
