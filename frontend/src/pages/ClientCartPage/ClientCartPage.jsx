@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../../components/Layout/Layout';
 import { useCart } from '../../context/CartContext';
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
+import Title from '../../components/Title/Title';
+import Table from '../../components/Table/Table';
+import Input from '../../components/Input/Input';
+import Select from '../../components/Select/Select';
+import Button from '../../components/Button/Button';
+import Checkbox from '../../components/Checkbox/Checkbox';
+import FormWrapper from '../../components/FormWrapper/FormWrapper';
+import styles from './ClientCartPage.module.css'
 
 export default function ClientCartPage() {
   const { items, addItem, removeItem, clear } = useCart();
@@ -15,7 +24,7 @@ export default function ClientCartPage() {
     try {
       const raw = localStorage.getItem('addresses.recent');
       if (raw) setRecent(JSON.parse(raw));
-    } catch {}
+    } catch { }
   }, []);
 
   const formatAddress = (a) => `ул. ${a.street || ''}, д. ${a.house || ''}${a.flat ? ', кв. ' + a.flat : ''}`.trim();
@@ -28,12 +37,11 @@ export default function ClientCartPage() {
       const next = [a, ...filtered].slice(0, 5);
       setRecent(next);
       localStorage.setItem('addresses.recent', JSON.stringify(next));
-    } catch {}
+    } catch { }
   };
 
   const submitOrder = (e) => {
     e.preventDefault();
-    // Пока без бэка: просто очистим корзину
     if (!pickup) {
       saveRecentAddress({ street: address.street, house: address.house, entrance: address.entrance, flat: address.flat, intercom: address.intercom });
     }
@@ -41,132 +49,187 @@ export default function ClientCartPage() {
     clear();
   };
 
+  const columns = ['Название блюда', 'Кол-во (шт.)', 'Цена, ₽', 'Действия'];
+  const data = items.map(item => [
+    item.name,
+    item.quantity,
+    Number(item.price).toFixed(2),
+    <div style={{ display: 'flex', gap: 8 }}>
+      <Button text="Добавить" onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.image }, 1)} />
+      <Button text="Удалить" onClick={() => removeItem(item.id)} />
+    </div>
+  ]);
+
   return (
     <Layout>
-      <h1 className="title-center title-blue">Оформление заказа</h1>
-      <div className="breadcrumbs"><a href="/">Главная</a> / <span>Корзина</span></div>
+      <Title>Оформление заказа</Title>
+      <Breadcrumbs
+        items={[
+          { label: 'Главная', to: '/' },
+          { label: 'Корзина' }
+        ]}
+      />
 
       <div className="cart-panel">
-        <table className="cart-table">
-          <thead>
-            <tr>
-              <th>Название блюда</th>
-              <th>Кол-во (шт.)</th>
-              <th>Цена, ₽</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 && (
-              <tr>
-                <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280' }}>Корзина пуста</td>
-              </tr>
+        {items.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#6b7280', marginTop: 32 }}>Корзина пуста</p>
+        ) : (
+          <Table columns={columns} data={data} />
+        )}
+
+        <div className="cart-total" style={{ textAlign: 'right', marginTop: 16 }}>
+          Итого к оплате: <strong>{total.toFixed(2)}</strong>
+        </div>
+
+        <Checkbox label="Самовывоз" checked={pickup} onChange={(e) => setPickup(e.target.checked)} />
+
+        <FormWrapper onSubmit={submitOrder} legend="">
+            {!pickup && recent.length > 0 && (
+              <Select
+                label="Ваши адреса:"
+                value=""
+                size="long"
+                onChange={(e) => {
+                  const idx = Number(e.target.value);
+                  if (!Number.isNaN(idx) && recent[idx]) {
+                    const a = recent[idx];
+                    setAddress({
+                      ...address,
+                      street: a.street || '',
+                      house: a.house || '',
+                      entrance: a.entrance || '',
+                      flat: a.flat || '',
+                      intercom: a.intercom || '',
+                    });
+                  }
+                }}
+                options={[
+                  { value: '', label: '—' },
+                  ...recent.map((a, i) => ({
+                    value: i,
+                    label: formatAddress(a),
+                  })),
+                ]}
+                className={styles.fullWidth}
+              />
             )}
-            {items.map(row => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{row.quantity}</td>
-                <td>{Number(row.price).toFixed(2)}</td>
-                <td className="actions">
-                  <button className="link-action" onClick={() => addItem({ id: row.id, name: row.name, price: row.price, image: row.image }, 1)}>Добавить</button>
-                  <button className="link-action" onClick={() => removeItem(row.id)}>Удалить</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
 
-        <div className="cart-total">Итого к оплате: <strong>{total.toFixed(2)}</strong></div>
+            {!pickup && (
+              <>
+                <Input
+                  label="Улица:"
+                  size="long"
+                  placeholder="ул. Введите название"
+                  value={address.street}
+                  onChange={(v) => setAddress({ ...address, street: v })}
+                  className={styles.fullWidth}
+                />
 
-        <label className="pickup"><input type="checkbox" checked={pickup} onChange={(e)=>setPickup(e.target.checked)} /> Самовывоз</label>
+                <div className={styles.inlineRow}>
+                  <Input
+                    label="Дом:"
+                    labelClassName={styles.inlineLabel}
+                    placeholder="Дом"
+                    value={address.house}
+                    onChange={(v) => setAddress({ ...address, house: v })}
+                    size="very-short"
+                    className={styles.quarterWidth}
+                  />
+                  <Input
+                    label="Подъезд:"
+                    placeholder="№"
+                    labelClassName={styles.inlineLabel}
+                    value={address.entrance}
+                    onChange={(v) => setAddress({ ...address, entrance: v })}
+                    size="very-short"
+                    className={styles.quarterWidth}
+                  />
+                  <Input
+                    label="Квартира:"
+                    placeholder="№"
+                    labelClassName={styles.inlineLabel}
+                    value={address.flat}
+                    onChange={(v) => setAddress({ ...address, flat: v })}
+                    size="very-short"
+                    className={styles.quarterWidth}
+                  />
+                </div>
+                <Input
+                  label="Домофон:"
+                  placeholder="Код"
+                  value={address.intercom}
+                  onChange={(v) => setAddress({ ...address, intercom: v })}
+                  size="very-short"
+                  className={styles.quarterWidth}
+                />
 
-        <form className="delivery-form" onSubmit={submitOrder}>
-          {!pickup && (
-          <div className="df-grid" style={{ gridTemplateColumns: '160px 1fr 0 0' }}>
-            <span className="df-label">Ваши адреса:</span>
-            <select className="form-select" onChange={(e)=>{
-              const idx = Number(e.target.value);
-              if (!Number.isNaN(idx) && recent[idx]) {
-                const a = recent[idx];
-                setAddress({ ...address, street: a.street||'', house: a.house||'', entrance: a.entrance||'', flat: a.flat||'', intercom: a.intercom||'' });
-              }
-            }}>
-              <option value="">—</option>
-              {recent.map((a,i)=> (
-                <option key={i} value={i}>{formatAddress(a)}</option>
-              ))}
-            </select>
-            <span />
-            <span />
-          </div>
-          )}
+                <Input
+                  label="Телефон:"
+                  isPhone
+                  value={address.phone}
+                  onChange={(v) => setAddress({ ...address, phone: v })}
+                  className={styles.halfWidth}
+                />
+                <Input
+                  label="Кол-во персон:"
+                  type="number"
+                  min={1}
+                  value={address.persons}
+                  onChange={(v) => setAddress({ ...address, persons: Number(v) })}
+                   size="very-short"
+                  className={styles.halfWidth}
+                />
 
-          {!pickup && (
-          <>
-          <div className="df-row"><span className="df-label">Введите адрес:</span></div>
+                <Input
+                  label="Комментарий к заказу:"
+                  labelTop
+                  isText
+                  placeholder="Текст"
+                  value={address.comment}
+                  onChange={(v) => setAddress({ ...address, comment: v })}
+                  className={styles.fullWidth}
+                />
 
-          <div className="df-grid">
-            <span className="df-label">Улица:</span>
-            <input className="form-input" placeholder="ул. Введите название" value={address.street} onChange={(e)=>setAddress({...address, street:e.target.value})} />
+                <Select
+                  label="Способ оплаты:"
+                  value={payment}
+                  onChange={setPayment}
+                  size="long"
+                  options={[
+                    { value: 'cash', label: 'Наличные' },
+                    { value: 'card', label: 'Картой при получении' },
+                  ]}
+                  className={styles.fullWidth}
+                />
+              </>
+            )}
 
-            <span className="df-label">Дом:</span>
-            <input className="form-input small" placeholder="дом" value={address.house} onChange={(e)=>setAddress({...address, house:e.target.value})} />
-
-            <span className="df-label">Подъезд:</span>
-            <input className="form-input small" placeholder="Номер подъезда" value={address.entrance} onChange={(e)=>setAddress({...address, entrance:e.target.value})} />
-
-            <span className="df-label">Квартира:</span>
-            <input className="form-input small" placeholder="Номер квартиры" value={address.flat} onChange={(e)=>setAddress({...address, flat:e.target.value})} />
-
-            <span className="df-label">Домофон:</span>
-            <input className="form-input small" placeholder="Код" value={address.intercom} onChange={(e)=>setAddress({...address, intercom:e.target.value})} />
-
-            <span className="df-label">Телефон:</span>
-            <input className="form-input" placeholder="+7 (___) ___-__-__" value={address.phone} onChange={(e)=>setAddress({...address, phone:e.target.value})} />
-
-            <span className="df-label">Кол-во персон:</span>
-            <input className="form-input small" type="number" min={1} value={address.persons} onChange={(e)=>setAddress({...address, persons:Number(e.target.value)})} />
-
-            <span className="df-label">Комментарий к заказу:</span>
-            <input className="form-input" placeholder="Текст" value={address.comment} onChange={(e)=>setAddress({...address, comment:e.target.value})} />
-          </div>
-          </>
-          )}
-
-          {!pickup && (
-          <div className="df-grid" style={{ gridTemplateColumns: '160px 1fr 0 0' }}>
-            <span className="df-label">Способ оплаты:</span>
-            <select className="form-select" value={payment} onChange={(e)=>setPayment(e.target.value)}>
-              <option value="cash">Наличные</option>
-              <option value="card">Картой при получении</option>
-            </select>
-            <span />
-            <span />
-          </div>
-          )}
-
-          {pickup && (
-            <div className="df-grid" style={{ gridTemplateColumns: '160px 1fr 0 0' }}>
-              <span className="df-label">Телефон:</span>
-              <input className="form-input" placeholder="+7 (___) ___-__-__" value={address.phone} onChange={(e)=>setAddress({...address, phone:e.target.value})} />
-              <span />
-              <span />
-              <span className="df-label">Комментарий к заказу:</span>
-              <input className="form-input" placeholder="Текст" value={address.comment} onChange={(e)=>setAddress({...address, comment:e.target.value})} />
-              <span />
-              <span />
-            </div>
-          )}
+            {pickup && (
+              <>
+                <Input
+                  label="Телефон:"
+                  isPhone
+                  value={address.phone}
+                  onChange={(v) => setAddress({ ...address, phone: v })}
+                  className={styles.fullWidth}
+                />
+                <Input
+                  label="Комментарий к заказу:"
+                  labelTop
+                  isText
+                  placeholder="Текст"
+                  value={address.comment}
+                  onChange={(v) => setAddress({ ...address, comment: v })}
+                  className={styles.fullWidth}
+                />
+              </>
+            )}
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-            <button type="submit" className="form-submit" style={{ minWidth: 300 }}>Оформить заказ</button>
+            <Button type="submit" text="Оформить заказ" />
           </div>
-        </form>
+        </FormWrapper>
       </div>
-
- 
     </Layout>
   );
 }
-
-

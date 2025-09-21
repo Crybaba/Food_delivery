@@ -2,6 +2,7 @@
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  padding: 0 16px;
 }
 
 .form-card {
@@ -9,7 +10,8 @@
   border: 2px dotted var(--color-border);
   background: var(--color-bg-muted);
   border-radius: var(--radius-sm);
-  width: 420px;
+  width: 100%;
+  max-width: 450px;
 }
 
 .form-grid {

@@ -5,8 +5,10 @@
   font-size: 16px;
   background: var(--color-bg);
   color: var(--color-ink);
-  width: 100%;
   box-sizing: border-box;
+  resize: none; /* для textarea */
+  width: auto;  /* 👈 вместо 100% */
+  display: inline-block; /* чтобы подстраивалось */
 }
 
 .input:focus {
@@ -16,6 +18,7 @@
 }
 
 .short { width: 90px; }
+.very-short { width: 60px; }
 .medium { width: 150px; }
 .long { width: 225px; }
 .phone { width: 140px; }
@@ -23,15 +26,32 @@
 .wrapper {
   display: flex;
   align-items: center;
-  gap: 10px; /* расстояние между label и input */
+  gap: 10px;
+  /* расстояние между label и input */
+}
+
+.wrapperVertical {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .label {
   font-weight: 600;
   font-size: 16px;
   color: var(--color-ink);
-  min-width: 125px; /* чтобы все лейблы были ровные */
-  text-align: right; /* выравнивание текста справа */
+  min-width: 125px;
+  /* чтобы все лейблы были ровные */
+  text-align: right;
+  /* выравнивание текста справа */
+}
+
+.labelTop {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink);
+  text-align: left;
 }
 
 .phone-prefix {
@@ -48,10 +68,22 @@
   width: 100%;
 }
 
+.textarea {
+  min-width: 225px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 50px;
+  max-height: 100px;
+  font-size: 16px;
+  padding: 10px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
 .required-indicator {
   position: absolute;
   top: 50%;
-  right: 8px; 
+  right: 8px;
   transform: translateY(-50%);
   color: var(--color-orange);
   font-weight: bold;

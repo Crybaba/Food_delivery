@@ -11,7 +11,9 @@ const Input = ({
   className = '',
   label = '',
   labelClassName = '',
-  required = false, // новый проп
+  required = false,
+  isText = false, // новый проп для текстового поля
+  labelTop = false,
 }) => {
   const inputRef = useRef(null);
 
@@ -49,13 +51,24 @@ const Input = ({
   };
 
   let widthClass = '';
-  if (size === 'short') widthClass = styles.short;
+  if (size === 'very-short') widthClass = styles['very-short'];
+  else if (size === 'short') widthClass = styles.short;
   else if (size === 'medium') widthClass = styles.medium;
   else if (size === 'long') widthClass = styles.long;
   else if (size === 'phone') widthClass = styles.phone;
 
   const renderInput = () => {
-    const inputElement = isPhone ? (
+    const inputElement = isText ? (
+      <textarea
+        ref={inputRef}
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className={`${styles.input} ${widthClass} ${styles.textarea} ${className}`}
+        maxLength={5000}
+        style={{ height: 'auto' }}
+      />
+    ) : isPhone ? (
       <div className={`${styles['phone-wrapper']} ${className}`}>
         <span className={styles['phone-prefix']}>+7</span>
         <input
@@ -93,9 +106,9 @@ const Input = ({
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={labelTop ? styles.wrapperVertical : styles.wrapper}>
       {label && (
-        <label className={`${styles.label} ${labelClassName}`}>
+        <label className={`${labelTop ? styles.labelTop : styles.label} ${labelClassName}`}>
           {label}
         </label>
       )}

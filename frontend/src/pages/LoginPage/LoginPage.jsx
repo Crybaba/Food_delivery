@@ -13,7 +13,7 @@ import styles from './LoginPage.module.css';
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [selectedRole] = useState('admin');
+  const [selectedRole] = useState('client');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 

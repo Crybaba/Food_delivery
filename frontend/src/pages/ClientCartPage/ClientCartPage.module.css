@@ -1,0 +1,63 @@
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr); /* 12 колонок */
+  gap: 16px; /* отступы между ячейками */
+  align-items: start; /* выравнивание по верхнему краю */
+}
+
+.fullWidth {
+  grid-column: span 12;
+}
+
+.halfWidth {
+  grid-column: span 6;
+}
+
+.thirdWidth {
+  grid-column: span 4;
+}
+
+.quarterWidth {
+  grid-column: span 3;
+}
+
+/* Стили для элементов формы в гриде */
+.formGrid .input-wrapper,
+.formGrid .select-wrapper {
+  display: block;
+  width: 100%;
+}
+.formGrid .input-wrapper .wrapper,
+.formGrid .select-wrapper .wrapper {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.formGrid .input-wrapper .label,
+.formGrid .select-wrapper .label {
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Центрированная строка на всю ширину */
+.centerRow {
+  grid-column: span 12;
+  display: flex;
+  justify-content: center;
+}
+
+
+.inlineRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.inlineLabel {
+  min-width: 60px !important;
+  text-align: right;
+}

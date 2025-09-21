@@ -20,6 +20,13 @@ function RoleRoute({ allow, children }) {
   return children;
 }
 
+// Приватный маршрут: доступен только авторизованным
+function PrivateRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return children;
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -47,7 +54,14 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/menu" element={<ClientMenuPage />} />
             <Route path="/orders" element={<ClientOrdersPage />} />
-            <Route path="/cart" element={<ClientCartPage />} />
+            <Route
+              path="/cart"
+              element={
+                <PrivateRoute>
+                  <ClientCartPage />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </CartProvider>
