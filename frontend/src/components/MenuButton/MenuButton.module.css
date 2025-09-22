@@ -28,3 +28,9 @@
 .btn-lightorange { background-color: #fd9e10; }
 .btn-yellow { background-color: #ffa500; }
 .btn-lightyellow { background-color: #ffb233; }
+
+/* Синие оттенки */
+.btn-blue { background-color: #3f8cff; }       /* насыщенный синий */
+.btn-lightblue { background-color: #2f32f1; }  /* светлый синий */
+.btn-skyblue { background-color: #693fff; }    /* голубой */
+.btn-steelblue { background-color: #923fff; }  /* стальной синий */

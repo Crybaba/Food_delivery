@@ -1,0 +1,15 @@
+.description {
+  text-align: left;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-key);
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+}

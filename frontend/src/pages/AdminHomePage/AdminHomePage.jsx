@@ -1,24 +1,45 @@
 import React from 'react';
 import Layout from '../../components/Layout/Layout';
-import OptionCard from '../../components/OptionCard/OptionCard';
-import { ClipboardList, Truck, Utensils, BarChart2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { FaClipboardList, FaTruck, FaUtensils, FaChartBar } from 'react-icons/fa';
+import Title from '../../components/Title/Title';
+import MenuButton from '../../components/MenuButton/MenuButton';
+import styles from './AdminHomePage.module.css';
 
 export default function AdminHomePage() {
   const navigate = useNavigate();
 
   return (
     <Layout>
-      <h1 className="title-center title-blue">Добро пожаловать в FOODR ИС!</h1>
-      <p className="text-center">Выберите опцию:</p>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <OptionCard title="Заказы" icon={<ClipboardList />} onClick={() => navigate('/admin/orders')} />
-        <OptionCard title="Учёт курьеров" icon={<Truck />} onClick={() => navigate('/admin/couriers')} />
-        <OptionCard title="Учёт блюд" icon={<Utensils />} onClick={() => navigate('/admin/dishes')} />
-        <OptionCard title="Анализ заказов" icon={<BarChart2 />} onClick={() => navigate('/admin/analytics')} />
+      <Title>Добро пожаловать в FOODR ИС!</Title>
+      <div className={styles['description']}>Выберите опцию:</div>
+
+      <div className={styles.cta}>
+        <MenuButton
+          text="Заказы"
+          icon={FaClipboardList}
+          color="blue"
+          onClick={() => navigate('/admin/orders')}
+        />
+        <MenuButton
+          text="Учёт курьеров"
+          icon={FaTruck}
+          color="lightblue"
+          onClick={() => navigate('/admin/couriers')}
+        />
+        <MenuButton
+          text="Учёт блюд"
+          icon={FaUtensils}
+          color="skyblue"
+          onClick={() => navigate('/admin/dishes')}
+        />
+        <MenuButton
+          text="Анализ заказов"
+          icon={FaChartBar}
+          color="steelblue"
+          onClick={() => navigate('/admin/analytics')}
+        />
       </div>
     </Layout>
   );
 }
-
-
