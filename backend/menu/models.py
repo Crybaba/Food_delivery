@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 class Dish(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название блюда")

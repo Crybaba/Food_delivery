@@ -3,6 +3,7 @@ from .models import Dish
 
 class DishSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Dish"""
+    image = serializers.ImageField(read_only=True)  # DRF автоматически строит URL
     
     class Meta:
         model = Dish
