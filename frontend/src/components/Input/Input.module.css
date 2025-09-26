@@ -27,7 +27,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  /* расстояние между label и input */
 }
 
 .wrapperVertical {
@@ -41,10 +40,8 @@
   font-weight: 600;
   font-size: 16px;
   color: var(--color-ink);
-  min-width: 125px;
-  /* чтобы все лейблы были ровные */
+  min-width: 120px; /* фиксированная ширина меток */
   text-align: right;
-  /* выравнивание текста справа */
 }
 
 .labelTop {
@@ -54,19 +51,28 @@
   text-align: left;
 }
 
-.phone-prefix {
-  font-weight: 600;
+.input {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: 16px;
+  background: var(--color-bg);
   color: var(--color-ink);
-  user-select: none;
-  margin-right: 4px;
+  box-sizing: border-box;
+  display: inline-block;
 }
 
-.input-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
 }
+
+.short { width: 90px; }
+.veryShort { width: 60px; }
+.medium { width: 150px; }
+.long { width: 225px; }
+.phone { width: 140px; }
 
 .textarea {
   min-width: 225px;
@@ -74,13 +80,18 @@
   max-width: 100%;
   min-height: 50px;
   max-height: 100px;
-  font-size: 16px;
   padding: 10px;
   line-height: 1.5;
   resize: vertical;
 }
 
-.required-indicator {
+.inputContainer {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.requiredIndicator {
   position: absolute;
   top: 50%;
   right: 8px;
@@ -88,4 +99,17 @@
   color: var(--color-orange);
   font-weight: bold;
   pointer-events: none;
+}
+
+.phoneWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.phonePrefix {
+  margin-right: 4px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink);
+  user-select: none;
 }

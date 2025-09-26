@@ -12,7 +12,7 @@ const Input = ({
   label = '',
   labelClassName = '',
   required = false,
-  isText = false, // новый проп для текстового поля
+  isText = false, // для textarea
   labelTop = false,
 }) => {
   const inputRef = useRef(null);
@@ -30,7 +30,6 @@ const Input = ({
 
   const handleChange = (e) => {
     let val = e.target.value;
-
     if (isPhone) {
       val = val.replace(/\D/g, '').substring(0, 11);
       const formatted = formatPhone(val);
@@ -50,12 +49,16 @@ const Input = ({
     onChange(val);
   };
 
-  let widthClass = '';
-  if (size === 'very-short') widthClass = styles['very-short'];
-  else if (size === 'short') widthClass = styles.short;
-  else if (size === 'medium') widthClass = styles.medium;
-  else if (size === 'long') widthClass = styles.long;
-  else if (size === 'phone') widthClass = styles.phone;
+  const widthClass = (() => {
+    switch (size) {
+      case 'very-short': return styles.veryShort;
+      case 'short': return styles.short;
+      case 'medium': return styles.medium;
+      case 'long': return styles.long;
+      case 'phone': return styles.phone;
+      default: return styles.medium;
+    }
+  })();
 
   const renderInput = () => {
     const inputElement = isText ? (
@@ -69,8 +72,8 @@ const Input = ({
         style={{ height: 'auto' }}
       />
     ) : isPhone ? (
-      <div className={`${styles['phone-wrapper']} ${className}`}>
-        <span className={styles['phone-prefix']}>+7</span>
+      <div className={`${styles.phoneWrapper} ${className}`}>
+        <span className={styles.phonePrefix}>+7</span>
         <input
           ref={inputRef}
           type="tel"
@@ -95,9 +98,9 @@ const Input = ({
 
     if (required) {
       return (
-        <div className={styles['input-container']}>
+        <div className={styles.inputContainer}>
           {inputElement}
-          <span className={styles['required-indicator']}>*</span>
+          <span className={styles.requiredIndicator}>*</span>
         </div>
       );
     }
