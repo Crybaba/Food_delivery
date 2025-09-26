@@ -1,12 +1,20 @@
 
 /* ========== GLOBAL VARIABLES ========== */
 :root {
-  --color-orange: #FF813D;
+  --color-orange: #ec8743;
   --color-orange-light: #FFB482;
-  --color-blue: #5474C4;
+  --color-orange-dark: #e56a20;   /* добавил для hover */
+
+  --color-blue: #708bd1;
+  --color-blue-dark: #3b57a8;     /* добавил для hover */
+
+  --color-gray: #5f80b9;
+  --color-gray-dark: #6B7280;
+
   --color-ink: #111827;
   --color-light-gray: #e0e0e0;
   --color-muted: #6B7280;
+
   --color-border: #E5E7EB;
   --color-bg: #FFFFFF;
   --color-bg-muted: #F8FAFC;

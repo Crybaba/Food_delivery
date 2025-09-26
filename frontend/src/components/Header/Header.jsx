@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Home, Menu as MenuIcon, ShoppingCart, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { NavLink } from 'react-router-dom';
 import Logo from '../Logo/Logo';
-import Button from '../Button/Button';
 import styles from './Header.module.css';
 
 export default function Header() {
@@ -18,19 +18,27 @@ export default function Header() {
   return (
     <header className={styles['site-header']}>
       <div className={styles['site-header-inner']}>
-        <Logo />
+        <div className={`${styles['brand']} ${styles['header-col']}`}>
+          <Logo />
+        </div>
 
         {/* Навигация */}
         <nav className={`${styles.nav} ${styles['header-col']}`}>
-          <Link to="/">
-            <Button text="Главная" icon={Home} color="orange" size="medium" fullWidth />
-          </Link>
-          <Link to="/menu">
-            <Button text="Меню" icon={MenuIcon} color="orange" size="medium" fullWidth />
-          </Link>
-          <Link to="/cart">
-            <Button text="Корзина" icon={ShoppingCart} color="orange" size="medium" fullWidth />
-          </Link>
+          <NavLink to="/" className={({ isActive }) =>
+            `${styles.navItem} ${isActive ? styles.active : ''}`}>
+            <Home size={20} />
+            <span>Главная</span>
+          </NavLink>
+          <NavLink to="/menu" className={({ isActive }) =>
+            `${styles.navItem} ${isActive ? styles.active : ''}`}>
+            <MenuIcon size={20} />
+            <span>Меню</span>
+          </NavLink>
+          <NavLink to="/cart" className={({ isActive }) =>
+            `${styles.navItem} ${isActive ? styles.active : ''}`}>
+            <ShoppingCart size={20} />
+            <span>Корзина</span>
+          </NavLink>
         </nav>
 
         {/* Правая часть */}
@@ -38,24 +46,19 @@ export default function Header() {
           {isAuthenticated ? (
             <>
               <span className={styles.role}>Роль: {role}</span>
-              <Button
-                text="Выход"
-                icon={LogOut}
-                onClick={handleLogout}
-                color="gray"
-                size="small"
-                fullWidth={false}
-              />
+              <button onClick={handleLogout} className={`${styles.navItem} ${styles.logout}`}>
+                <LogOut size={18} />
+                <span>Выход</span>
+              </button>
             </>
           ) : (
-            <Button
-              text="Вход"
-              icon={LogIn}
+            <button
               onClick={() => navigate('/login')}
-              color="blue"
-              size="small"
-              fullWidth={false}
-            />
+              className={`${styles.navItem} ${styles.login}`}
+            >
+              <LogIn size={18} />
+              <span>Вход</span>
+            </button>
           )}
         </div>
       </div>

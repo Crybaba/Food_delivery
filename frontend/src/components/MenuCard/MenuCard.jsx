@@ -41,17 +41,21 @@ const MenuCard = ({ title, image, price, description, calories, onAddToCart, dis
             text="В корзину"
             color="orange"
             size="medium"
-            fullWidth = "True"
-            onClick={() => onAddToCart?.()}
+            fullWidth
+            radius="md"       // используем конкретный радиус
+            onClick={() => console.log('clicked')}
           />
+
           <Button
             text="О блюде…"
             color="blue"
             variant="outline"
             size="small"
-            fullWidth = "True"
-            onClick={() => setOpen(true)}
+            fullWidth
+            radius="md"       // больше радиус
+            onClick={() => console.log('clicked')}
           />
+
         </div>
       </div>
 

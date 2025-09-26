@@ -1,25 +1,25 @@
-/* ========== HEADER ========== */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
   width: 100%;
-  border-bottom: 1px solid var(--color-orange-light);
-  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
   backdrop-filter: saturate(150%) blur(6px);
 }
 
 .site-header-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 10px 24px;
+  align-items: stretch;
+  padding: 0 24px;
   gap: 12px;
+  height: 56px;
 }
 
 .header-col {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
 }
 
@@ -29,17 +29,79 @@
 
 .header-right.header-col {
   justify-content: flex-end;
-}
-
-/* Навигация */
-.nav {
-  display: flex;
-  align-items: center;
   gap: 8px;
 }
 
+/* ================== НАВИГАЦИЯ ================== */
+.nav {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-width: 150px;
+  padding: 0 22px;
+  height: 100%;
+
+  font-size: 17px;        /* чуть больше */
+  font-weight: 600;       /* жирнее */
+  color: var(--color-ink);
+  background: var(--color-bg);
+
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.navItem svg {
+  width: 22px;   /* увеличенные иконки */
+  height: 22px;
+}
+
+.navItem:hover {
+  background: var(--color-orange-light);
+}
+
+.navItem.active {
+  background: var(--color-orange);
+  color: var(--color-white);
+}
+
+
+.logout {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+.logout:hover {
+  background: var(--color-gray);
+  color: var(--color-white);
+}
+
+.login {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+.login:hover {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
 .role {
-  color: var(--color-blue);
-  font-size: 16px;
-  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  color: var(--color-muted);
+  font-size: 15px;
+  padding-right: 8px;
 }

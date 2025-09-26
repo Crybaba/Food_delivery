@@ -1,6 +1,6 @@
 .button {
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm); /* стандартный радиус */
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -8,7 +8,7 @@
   justify-content: center;
   gap: 8px;
   box-shadow: var(--shadow-sm);
-  transition: filter var(--transition-fast);
+  transition: filter var(--transition-fast), transform 0.1s;
 }
 
 .button:hover {
@@ -31,18 +31,18 @@
   color: var(--color-white);
 }
 
+.btn-muted {
+  background: var(--color-gray);
+  color: var(--color-white);
+}
+
 /* Варианты */
 .btn-variant-outline-blue {
   background: var(--color-white);
   color: var(--color-blue);
   border: 1px solid var(--color-blue);
   box-shadow: none;
-  border-radius: var(--radius-lg);
-}
-
-.btn-muted {
-  background: var(--color-gray);
-  color: var(--color-white);
+  border-radius: var(--radius-lg); /* будет переопределён через проп radius */
 }
 
 /* Размеры */
