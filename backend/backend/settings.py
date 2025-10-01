@@ -17,21 +17,6 @@ if load_dotenv is not None:
     load_dotenv(PROJECT_ROOT / '.env')
     load_dotenv(PROJECT_ROOT / '.env.local', override=True)
 
-# Очистка потенциально проблемных переменных PostgreSQL
-for _pg_var in [
-    'PGHOST', 'PGDATABASE', 'PGUSER', 'PGPASSWORD', 'PGPORT', 'PGHOSTADDR',
-    'PGSERVICE', 'PGSERVICEFILE', 'PGSYSCONFDIR', 'PGSSLMODE', 'PGREALM',
-    'PGOPTIONS'
-]:
-    if _pg_var in os.environ:
-        os.environ.pop(_pg_var, None)
-
-os.environ['PGCLIENTENCODING'] = 'UTF8'
-os.environ['PGSERVICE'] = ''
-os.environ['PGSERVICEFILE'] = ''
-os.environ['PGSYSCONFDIR'] = str(BASE_DIR)
-os.environ['PGPASSFILE'] = 'NUL' if os.name == 'nt' else '/dev/null'
-
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-insecure-secret-key')
 DEBUG = os.getenv('DEBUG', '1') in ['1', 'true', 'True', 'yes', 'on']
 
@@ -43,6 +28,7 @@ else:
 
 INSTALLED_APPS = [
     'menu',
+    'accounts',
     'corsheaders',
     'rest_framework',
     'django_filters',
@@ -54,7 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+AUTH_USER_MODEL = "accounts.User"
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',            # <-- должен быть первым
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,11 +51,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
 
+CSRF_COOKIE_SECURE = False  
+SESSION_COOKIE_SECURE = False 
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]  
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [

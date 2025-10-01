@@ -17,7 +17,15 @@ Including another URLconf
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+@ensure_csrf_cookie
+def get_csrf(request):
+    return JsonResponse({'detail': 'CSRF cookie set'})
 
 urlpatterns = [
     path('menu/', include('menu.urls')),
+    path("accounts/", include("accounts.urls")),
+    path('csrf/', get_csrf)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
