@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',            # <-- должен быть первым
+    'corsheaders.middleware.CorsMiddleware',       
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,6 +63,9 @@ SESSION_COOKIE_SECURE = False
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]  
 ROOT_URLCONF = 'backend.urls'
+
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
 
 TEMPLATES = [
     {
