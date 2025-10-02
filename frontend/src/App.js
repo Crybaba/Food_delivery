@@ -37,7 +37,7 @@ export default function App() {
             <Route
               path="/admin"
               element={
-                <RoleRoute allow={['admin']}>
+                <RoleRoute allow={['ADMIN']}>
                   <AdminHomePage />
                 </RoleRoute>
               }
@@ -45,7 +45,7 @@ export default function App() {
             <Route
               path="/courier"
               element={
-                <RoleRoute allow={['courier']}>
+                <RoleRoute allow={['COURIER']}>
                   <CourierHomePage />
                 </RoleRoute>
               }

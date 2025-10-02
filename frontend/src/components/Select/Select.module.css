@@ -12,15 +12,8 @@
 .wrapper {
   display: flex;
   align-items: center;
-  gap: 10px; /* расстояние между лейблом и селектом */
-}
-
-.label {
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--color-ink);
-  min-width: 125px; /* чтобы все лейблы были ровные */
-  text-align: right;
+  gap: 6px;           /* расстояние между полями, если несколько в строке */
+  flex-wrap: nowrap;   /* поля в одну строку */
 }
 
 .input-container {

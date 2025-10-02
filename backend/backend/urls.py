@@ -27,5 +27,6 @@ def get_csrf(request):
 urlpatterns = [
     path('menu/', include('menu.urls')),
     path("accounts/", include("accounts.urls")),
-    path('csrf/', get_csrf)
+    path("orders/", include("orders.urls")),
+    path("csrf/", get_csrf)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,14 +1,13 @@
+/* Сам input */
 .input {
-  padding: 8px 10px;
+  padding: 6px 8px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 16px;
   background: var(--color-bg);
   color: var(--color-ink);
   box-sizing: border-box;
-  resize: none; /* для textarea */
-  width: auto;  /* 👈 вместо 100% */
-  display: inline-block; /* чтобы подстраивалось */
+  display: inline-block;
 }
 
 .input:focus {
@@ -23,10 +22,12 @@
 .long { width: 225px; }
 .phone { width: 140px; }
 
+/* Контейнер для input */
 .wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;           /* расстояние между полями, если несколько в строке */
+  flex-wrap: nowrap;   /* поля в одну строку */
 }
 
 .wrapperVertical {
@@ -35,44 +36,6 @@
   align-items: flex-start;
   gap: 6px;
 }
-
-.label {
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--color-ink);
-  min-width: 120px; /* фиксированная ширина меток */
-  text-align: right;
-}
-
-.labelTop {
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--color-ink);
-  text-align: left;
-}
-
-.input {
-  padding: 8px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  background: var(--color-bg);
-  color: var(--color-ink);
-  box-sizing: border-box;
-  display: inline-block;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
-}
-
-.short { width: 90px; }
-.veryShort { width: 60px; }
-.medium { width: 150px; }
-.long { width: 225px; }
-.phone { width: 140px; }
 
 .textarea {
   min-width: 225px;
@@ -86,15 +49,12 @@
 }
 
 .inputContainer {
-  position: relative;
-  display: inline-block;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .requiredIndicator {
-  position: absolute;
-  top: 50%;
-  right: 8px;
   transform: translateY(-50%);
   color: var(--color-orange);
   font-weight: bold;

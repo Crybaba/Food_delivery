@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import Layout from '../../components/Layout/Layout';
 import { useCart } from '../../context/CartContext';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
@@ -9,56 +9,78 @@ import Select from '../../components/Select/Select';
 import Button from '../../components/Button/Button';
 import Checkbox from '../../components/Checkbox/Checkbox';
 import FormWrapper from '../../components/FormWrapper/FormWrapper';
-import styles from './ClientCartPage.module.css'
+import styles from './ClientCartPage.module.css';
 
 export default function ClientCartPage() {
-  const { items, addItem, removeItem, clear } = useCart();
+  const { cart, addItem, removeItem, clearAll, makeOrder } = useCart();
+
   const [pickup, setPickup] = useState(false);
-  const [address, setAddress] = useState({ street: '', house: '', entrance: '', flat: '', intercom: '', phone: '', persons: 1, comment: '' });
-  const [recent, setRecent] = useState([]);
+  const [address, setAddress] = useState({
+    street: '', house: '', entrance: '', flat: '',
+    intercom: '', phone: '', persons: 1, comment: ''
+  });
   const [payment, setPayment] = useState('cash');
 
-  const total = useMemo(() => items.reduce((s, i) => s + Number(i.price) * i.quantity, 0), [items]);
+  const total = cart?.total_price || 0;
+  const items = cart?.items || [];
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('addresses.recent');
-      if (raw) setRecent(JSON.parse(raw));
-    } catch { }
-  }, []);
-
-  const formatAddress = (a) => `ул. ${a.street || ''}, д. ${a.house || ''}${a.flat ? ', кв. ' + a.flat : ''}`.trim();
-
-  const saveRecentAddress = (a) => {
-    try {
-      const current = Array.isArray(recent) ? recent : [];
-      const key = JSON.stringify(a);
-      const filtered = current.filter(x => JSON.stringify(x) !== key);
-      const next = [a, ...filtered].slice(0, 5);
-      setRecent(next);
-      localStorage.setItem('addresses.recent', JSON.stringify(next));
-    } catch { }
-  };
-
-  const submitOrder = (e) => {
+  const submitOrder = async (e) => {
     e.preventDefault();
-    if (!pickup) {
-      saveRecentAddress({ street: address.street, house: address.house, entrance: address.entrance, flat: address.flat, intercom: address.intercom });
+
+    // Очистка телефона
+    const cleanPhone = address.phone.replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      alert('Введите корректный номер телефона из 10 цифр');
+      return;
     }
-    alert('Заказ оформлен (демо).');
-    clear();
+
+    // Формируем объект для бэка
+    const orderData = {
+      ...address,
+      phone: cleanPhone,
+      payment,
+      pickup,
+      items: items.map(item => ({
+        dish_id: item.dish.id,
+        quantity: item.quantity
+      })),
+      // если самовывоз, заполняем адрес дефолтами
+      street: pickup ? '' : address.street,
+      house: pickup ? '' : address.house,
+      entrance: pickup ? '' : address.entrance,
+      flat: pickup ? '' : address.flat,
+      intercom: pickup ? '' : address.intercom,
+      persons: pickup ? 1 : address.persons,
+    };
+
+    try {
+      await makeOrder(orderData); // эта функция вызывает API /orders/create/
+      clearAll();
+      alert('Заказ оформлен!');
+    } catch (err) {
+      console.error(err);
+      alert('Ошибка при оформлении заказа');
+    }
   };
 
-  const columns = ['Название блюда', 'Кол-во (шт.)', 'Цена, ₽', 'Действия'];
-  const data = items.map(item => [
-    item.name,
-    item.quantity,
-    Number(item.price).toFixed(2),
-    <div style={{ display: 'flex', gap: 8 }}>
-      <Button text="Добавить" onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.image }, 1)} />
-      <Button text="Удалить" onClick={() => removeItem(item.id)} />
-    </div>
-  ]);
+  const columns = [
+    { key: 'name', label: 'Название блюда' },
+    { key: 'quantity', label: 'Кол-во (шт.)', align: 'center', width: '120px' },
+    { key: 'sum', label: 'Сумма, ₽', align: 'right', width: '120px' },
+    { key: 'actions', label: 'Действия', align: 'center', width: '160px' },
+  ];
+
+  const data = items.map(item => ({
+    name: item.dish.name,
+    quantity: item.quantity,
+    sum: (Number(item.dish.price) * item.quantity).toFixed(2),
+    actions: (
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+        <Button size="small" text="+" onClick={() => addItem(item.dish.id, 1)} />
+        <Button size="small" text="–" onClick={() => removeItem(item.dish.id)} />
+      </div>
+    ),
+  }));
 
   return (
     <Layout>
@@ -72,164 +94,148 @@ export default function ClientCartPage() {
 
       <div className="cart-panel">
         {items.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#6b7280', marginTop: 32 }}>Корзина пуста</p>
+          <p style={{ textAlign: 'center', color: '#6b7280', marginTop: 32 }}>
+            Корзина пуста
+          </p>
         ) : (
           <Table columns={columns} data={data} />
         )}
 
         <div className="cart-total" style={{ textAlign: 'right', marginTop: 16 }}>
-          Итого к оплате: <strong>{total.toFixed(2)}</strong>
+          Итого к оплате: <strong>{total.toFixed(2)} ₽</strong>
         </div>
 
-        <Checkbox label="Самовывоз" checked={pickup} onChange={(e) => setPickup(e.target.checked)} />
+        <Checkbox
+          label="Самовывоз"
+          checked={pickup}
+          onChange={(e) => setPickup(e.target.checked)}
+        />
 
         <FormWrapper onSubmit={submitOrder} legend="">
-            {!pickup && recent.length > 0 && (
-              <Select
-                label="Ваши адреса:"
-                value=""
-                size="long"
-                onChange={(e) => {
-                  const idx = Number(e.target.value);
-                  if (!Number.isNaN(idx) && recent[idx]) {
-                    const a = recent[idx];
-                    setAddress({
-                      ...address,
-                      street: a.street || '',
-                      house: a.house || '',
-                      entrance: a.entrance || '',
-                      flat: a.flat || '',
-                      intercom: a.intercom || '',
-                    });
-                  }
-                }}
-                options={[
-                  { value: '', label: '—' },
-                  ...recent.map((a, i) => ({
-                    value: i,
-                    label: formatAddress(a),
-                  })),
-                ]}
-                className={styles.fullWidth}
-              />
-            )}
-
-            {!pickup && (
+          <div className={styles.formGrid}>
+            {!pickup ? (
               <>
-                <Input
-                  label="Улица:"
-                  size="long"
-                  placeholder="ул. Введите название"
-                  value={address.street}
-                  onChange={(v) => setAddress({ ...address, street: v })}
-                  className={styles.fullWidth}
-                />
-
-                <div className={styles.inlineRow}>
+                <div className={styles.formRow}>
+                  <label htmlFor="street">Улица:</label>
                   <Input
-                    label="Дом:"
-                    labelClassName={styles.inlineLabel}
-                    placeholder="Дом"
+                    id="street"
+                    value={address.street}
+                    onChange={(v) => setAddress({ ...address, street: v })}
+                    size="long"
+                    placeholder='Название улицы'
+                  />
+                </div>
+
+                <div className={styles.formRow}>
+                  <label>Дом:</label>
+                  <Input
                     value={address.house}
                     onChange={(v) => setAddress({ ...address, house: v })}
                     size="very-short"
-                    className={styles.quarterWidth}
+                    placeholder='№'
                   />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Подъезд:</label>
                   <Input
-                    label="Подъезд:"
-                    placeholder="№"
-                    labelClassName={styles.inlineLabel}
                     value={address.entrance}
                     onChange={(v) => setAddress({ ...address, entrance: v })}
                     size="very-short"
-                    className={styles.quarterWidth}
+                    placeholder='№'
                   />
+                </div>
+                <div className={styles.formRow}>
+                  <label>Квартира:</label>
                   <Input
-                    label="Квартира:"
-                    placeholder="№"
-                    labelClassName={styles.inlineLabel}
                     value={address.flat}
                     onChange={(v) => setAddress({ ...address, flat: v })}
                     size="very-short"
-                    className={styles.quarterWidth}
+                    placeholder='№'
                   />
                 </div>
-                <Input
-                  label="Домофон:"
-                  placeholder="Код"
-                  value={address.intercom}
-                  onChange={(v) => setAddress({ ...address, intercom: v })}
-                  size="very-short"
-                  className={styles.quarterWidth}
-                />
 
-                <Input
-                  label="Телефон:"
-                  isPhone
-                  value={address.phone}
-                  onChange={(v) => setAddress({ ...address, phone: v })}
-                  className={styles.halfWidth}
-                />
-                <Input
-                  label="Кол-во персон:"
-                  type="number"
-                  min={1}
-                  value={address.persons}
-                  onChange={(v) => setAddress({ ...address, persons: Number(v) })}
-                   size="very-short"
-                  className={styles.halfWidth}
-                />
+                <div className={styles.formRow}>
+                  <label>Домофон:</label>
+                  <Input
+                    value={address.intercom}
+                    onChange={(v) => setAddress({ ...address, intercom: v })}
+                    size="very-short"
+                    placeholder='№'
+                  />
+                  <label>Телефон:</label>
+                  <Input
+                    value={address.phone}
+                    onChange={(v) => setAddress({ ...address, phone: v })}
+                    isPhone
+                    size="phone"
+                  />
+                </div>
 
-                <Input
-                  label="Комментарий к заказу:"
-                  labelTop
-                  isText
-                  placeholder="Текст"
-                  value={address.comment}
-                  onChange={(v) => setAddress({ ...address, comment: v })}
-                  className={styles.fullWidth}
-                />
+                <div className={styles.formRow}>
+                  <label>Кол-во персон:</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={address.persons}
+                    onChange={(v) => setAddress({ ...address, persons: Number(v) })}
+                    size="very-short"
+                  />
+                </div>
 
-                <Select
-                  label="Способ оплаты:"
-                  value={payment}
-                  onChange={setPayment}
-                  size="long"
-                  options={[
-                    { value: 'cash', label: 'Наличные' },
-                    { value: 'card', label: 'Картой при получении' },
-                  ]}
-                  className={styles.fullWidth}
-                />
+                <div className={styles.formRow}>
+                  <label>Комментарий к заказу:</label>
+                  <Input
+                    value={address.comment}
+                    onChange={(v) => setAddress({ ...address, comment: v })}
+                    isText
+                    labelTop
+                    placeholder='Введите текст:'
+                  />
+                </div>
+
+                <div className={styles.formRow}>
+                  <label>Способ оплаты:</label>
+                  <Select
+                    value={payment}
+                    onChange={setPayment}
+                    size="medium"
+                    options={[
+                      { value: 'cash', label: 'Наличные' },
+                      { value: 'card', label: 'Картой при получении' },
+                    ]}
+                    className={styles.fullWidth}
+                  />
+                </div>
               </>
-            )}
-
-            {pickup && (
+            ) : (
               <>
-                <Input
-                  label="Телефон:"
-                  isPhone
-                  value={address.phone}
-                  onChange={(v) => setAddress({ ...address, phone: v })}
-                  className={styles.fullWidth}
-                />
-                <Input
-                  label="Комментарий к заказу:"
-                  labelTop
-                  isText
-                  placeholder="Текст"
-                  value={address.comment}
-                  onChange={(v) => setAddress({ ...address, comment: v })}
-                  className={styles.fullWidth}
-                />
+                <div className={styles.formRow}>
+                  <label>Телефон:</label>
+                  <Input
+                    value={address.phone}
+                    onChange={(v) => setAddress({ ...address, phone: v })}
+                    isPhone
+                    size="phone"
+                  />
+                </div>
+
+                <div className={styles.formRow}>
+                  <label>Комментарий к заказу:</label>
+                  <Input
+                    value={address.comment}
+                    onChange={(v) => setAddress({ ...address, comment: v })}
+                    isText
+                    labelTop
+                    className={styles.fullWidth}
+                  />
+                </div>
               </>
             )}
-
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-            <Button type="submit" text="Оформить заказ" />
           </div>
+
+          <Button type="submit" text="Оформить заказ" />
         </FormWrapper>
-      </div>
-    </Layout>
+      </div >
+    </Layout >
   );
 }

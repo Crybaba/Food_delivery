@@ -1,0 +1,106 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--color-bg);
+  width: min(900px, 92vw);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  padding: 20px;
+}
+
+.close {
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.header {
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-blue);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.body {
+  display: flex;
+  gap: 16px; /* расстояние между картинкой и инфо */
+}
+
+.leftSide {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* верх: картинка, низ: controls */
+}
+
+.imageWrapper {
+  background: var(--color-light-gray);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.imagePlaceholder {
+  color: var(--color-muted);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.priceLabel {
+  color: var(--color-blue);
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.price {
+  font-weight: 900;
+  color: var(--color-blue-dark);
+}
+
+.meta {
+  margin: 6px 0 10px;
+  color: var(--color-muted);
+}
+
+.description {
+  color: var(--color-ink);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* слева */
+  gap: 10px;
+  margin-top: 8px; /* отступ сверху от картинки */
+}

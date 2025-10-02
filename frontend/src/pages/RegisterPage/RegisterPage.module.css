@@ -1,23 +1,22 @@
-.login-link {
+.formGrid {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
+  flex-direction: column;
+  gap: 12px; /* расстояние между строками */
+  margin-top: 16px;
+  max-width: 400px; /* ограничение ширины формы */
 }
 
-.login-link-label {
-  display: inline-block;
-  margin: 0;
-  line-height: 1;
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* расстояние между label и полем */
 }
 
-.login-link-text {
-  display: inline-flex;
-  align-items: center;
-  line-height: 1;
-  margin: 0;
-  padding: 0;
-  color: var(--color-blue);
-  font-weight: bold;
+.formRow label {
+  width: 120px; /* фиксированная ширина метки */
+  text-align: right;
+  font-weight: 600;
+  white-space: normal;        /* разрешаем перенос текста */
+  word-break: break-word;     /* переносим длинные слова при необходимости */
 }
+

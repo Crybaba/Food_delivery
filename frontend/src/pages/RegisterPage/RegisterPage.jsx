@@ -22,14 +22,44 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [gender, setGender] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       alert('Пароли не совпадают');
       return;
     }
-    register({ surname, name, patronymic, phone, password, gender });
-    navigate('/login');
+
+    // Очищаем телефон от всех символов кроме цифр
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10); // последние 10 цифр (без +7)
+
+    // Валидация телефона
+    if (cleanPhone.length !== 10) {
+      alert('Введите корректный номер телефона из 10 цифр (без +7)');
+      return;
+    }
+
+    try {
+      const result = await register({
+        surname,
+        name,
+        patronymic,
+        phone: cleanPhone,
+        password,
+        gender
+      });
+
+      if (result.success) {
+        alert('Регистрация успешна! Войдите в аккаунт.');
+        navigate('/login');
+      } else {
+        // Показываем реальные ошибки от сервера
+        alert(result.message);
+      }
+    } catch (err) {
+      // Ошибки на уровне fetch
+      alert(err.message || 'Произошла неизвестная ошибка');
+    }
   };
 
   return (
@@ -43,80 +73,106 @@ export default function RegisterPage() {
       />
 
       <FormWrapper onSubmit={handleSubmit} legend="* — обязательно для заполнения">
+        {/* Ссылка на вход */}
         <div className={styles['login-link']}>
-          <span className={styles['login-link-label']}>Уже есть аккаунт?</span>
+          <span className={styles['login-link-label']}>Уже есть аккаунт? </span>
           <Link to="/login" className={styles['login-link-text']}>
             Войти
           </Link>
         </div>
 
-        <Input
-          label="Фамилия:"
-          value={surname}
-          size="long"
-          onChange={setSurname}
-          placeholder="Введите фамилию"
-          required
-        />
+        {/* Грид для всех полей */}
+        <div className={styles.formGrid}>
+          <div className={styles.formRow}>
+            <label htmlFor="surname">Фамилия:</label>
+            <Input
+              id="surname"
+              value={surname}
+              size="long"
+              onChange={setSurname}
+              placeholder="Введите фамилию"
+              required
+            />
+          </div>
 
-        <Input
-          label="Имя:"
-          value={name}
-          size="long"
-          onChange={setName}
-          placeholder="Введите имя"
-          required
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="name">Имя:</label>
+            <Input
+              id="name"
+              value={name}
+              size="long"
+              onChange={setName}
+              placeholder="Введите имя"
+              required
+            />
+          </div>
 
-        <Input
-          label="Отчество:"
-          value={patronymic}
-          size="long"
-          onChange={setPatronymic}
-          placeholder="Введите отчество"
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="patronymic">Отчество:</label>
+            <Input
+              id="patronymic"
+              value={patronymic}
+              size="long"
+              onChange={setPatronymic}
+              placeholder="Введите отчество"
+            />
+          </div>
 
-        <Input
-          label="Телефон:"
-          value={phone}
-          size="phone"
-          onChange={setPhone}
-          isPhone
-          placeholder="+7 (___) ___-__-__"
-          required
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="phone">Телефон:</label>
+            <Input
+              id="phone"
+              value={phone}
+              size="phone"
+              onChange={setPhone}
+              isPhone
+              placeholder="+7 (___) ___-__-__"
+              required
+            />
+          </div>
 
-        <Input
-          label="Пароль:"
-          type="password"
-          value={password}
-          onChange={setPassword}
-          placeholder="*****"
-          required
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="password">Пароль:</label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={setPassword}
+              placeholder="*****"
+              required
+            />
+          </div>
 
-        <Input
-          label="Повторите пароль:"
-          type="password"
-          value={confirmPassword}
-          onChange={setConfirmPassword}
-          placeholder="*****"
-          required
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="confirmPassword">Повторите пароль:</label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              placeholder="*****"
+              required
+            />
+          </div>
 
-        <Select
-          label="Пол:"
-          value={gender}
-          onChange={setGender}
-          size="short"
-          options={[
-            { value: '', label: '—' },
-            { value: 'M', label: 'М' },
-            { value: 'F', label: 'Ж' }
-          ]}
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="gender">Пол:</label>
+            <Select
+              id="gender"
+              value={gender}
+              onChange={setGender}
+              size="short"
+              options={[
+                { value: '', label: '—' },
+                { value: 'M', label: 'М' },
+                { value: 'F', label: 'Ж' },
+              ]}
+            />
+          </div>
+        </div>
 
-        <Button type="submit" text="Зарегистрироваться"/>
+        {/* Кнопка регистрации отдельно */}
+        <Button type="submit" text="Зарегистрироваться" className={styles.formSubmit} />
       </FormWrapper>
     </Layout>
   );

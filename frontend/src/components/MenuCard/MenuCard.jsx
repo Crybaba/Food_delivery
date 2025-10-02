@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../Button/Button';
 import styles from './MenuCard.module.css';
-import OrderDetailsModal from '../OrderDetailsModal/OrderDetailsModal';
+import OrderDetailsModal from '../DishDetailsModal/DishDetailsModal';
 
 const MenuCard = ({ title, image, price, description, calories, onAddToCart, dish }) => {
   const [open, setOpen] = useState(false);

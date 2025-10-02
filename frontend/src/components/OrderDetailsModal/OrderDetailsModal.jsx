@@ -1,59 +1,48 @@
-import React, { useState } from 'react';
-import Button from '../Button/Button';
-import Input from '../Input/Input'; // ✅ импорт твоего инпута
+import React from 'react';
 import styles from './OrderDetailsModal.module.css';
+import Table from '../Table/Table';
 
-export default function OrderDetailsModal({ dish, onClose, onAddToCart }) {
-  const [quantity, setQuantity] = useState('1'); // строка, чтобы Input корректно работал
+export default function OrderDetailsModal({ order, onClose }) {
+  if (!order) return null;
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
-  };
+  const columns = [
+    { key: 'dish', label: 'Блюдо' },
+    { key: 'quantity', label: 'Кол-во', align: 'center', width: '80px' },
+    { key: 'price', label: 'Цена, ₽', align: 'right', width: '100px' },
+    { key: 'sum', label: 'Сумма, ₽', align: 'right', width: '120px' }
+  ];
 
-  const addToCart = () => {
-    const safeQty = Number.isFinite(Number(quantity)) && Number(quantity) > 0 ? Number(quantity) : 1;
-    onAddToCart?.(safeQty);
-    onClose?.();
-  };
+  const data = order.items.map((item, idx) => ({
+    dish: item.dish_name || item.dish,
+    quantity: item.quantity,
+    price: item.price || 0,
+    sum: ((Number(item.price) || 0) * item.quantity).toFixed(2)
+  }));
+
+  const total = data.reduce((acc, item) => acc + Number(item.sum), 0).toFixed(2);
 
   return (
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
-      <div className={styles.modal} role="dialog" aria-modal="true">
-        <button className={styles.close} onClick={onClose} aria-label="Закрыть">×</button>
+    <div className={styles.backdrop} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.close} onClick={onClose}>&times;</button>
 
         <div className={styles.header}>
-          <h3 className={styles.title}>{dish?.name}</h3>
+          <h2 className={styles.title}>Заказ #{order.id}</h2>
+          <p className={styles.meta}>Статус: {order.status}</p>
         </div>
 
-        <div className={styles.body}>
-          <div className={styles.imageWrapper}>
-            {dish?.image ? (
-              <img className={styles.image} src={dish.image} alt={dish?.name} />
-            ) : (
-              <div className={styles.imagePlaceholder}>Изображение</div>
-            )}
-          </div>
-          <div className={styles.info}>
-            <p className={styles.priceLabel}>Цена: <span className={styles.price}>{dish?.price} ₽</span></p>
-            {dish?.calories != null && (
-              <p className={styles.meta}>Калорийность: {dish.calories} ккал</p>
-            )}
-            {dish?.description && (
-              <p className={styles.description}>{dish.description}</p>
-            )}
+        <div className={styles.info}>
+          <p><strong>Адрес:</strong> {order.pickup ? 'Самовывоз' : `${order.street}, ${order.house}, кв.${order.flat}`}</p>
+          <p><strong>Телефон:</strong> {order.phone}</p>
+          <p><strong>Курьер:</strong> {order.courier || 'Не назначен'}</p>
+          <p><strong>Комментарий:</strong> {order.comment || '-'}</p>
 
-            <div className={styles.controls}>
-              <Input
-                value={quantity}
-                onChange={setQuantity}
-                type="number"
-                min={1}
-                size="very-short"            // можно подогнать под дизайн
-                label="Количество"
-              />
-              <Button text="В корзину" color="orange" size="medium" onClick={addToCart} />
-            </div>
-          </div>
+          <h3>Состав заказа:</h3>
+          <Table columns={columns} data={data} />
+
+          <p className={styles.priceLabel}>
+            Итого: <span className={styles.price}>{total} ₽</span>
+          </p>
         </div>
       </div>
     </div>

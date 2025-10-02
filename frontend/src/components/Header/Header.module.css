@@ -77,7 +77,6 @@
   color: var(--color-white);
 }
 
-
 .logout {
   background: var(--color-bg);
   color: var(--color-ink);
@@ -104,4 +103,18 @@
   color: var(--color-muted);
   font-size: 15px;
   padding-right: 8px;
+}
+
+.cartSection{
+  display: flex;
+  flex-direction: column;
+}
+
+.cartTotal {
+  background-color: var(--color-orange);
+  font-weight: 700;
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: 0px 6px;
+  font-size: 14px;
 }

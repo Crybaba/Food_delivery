@@ -13,18 +13,35 @@ import styles from './LoginPage.module.css';
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [selectedRole] = useState('client');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(selectedRole);
-    if (selectedRole === 'admin') navigate('/admin');
-    else if (selectedRole === 'courier') navigate('/courier');
-    else navigate('/');
-  };
 
+    // Очищаем номер от всего, кроме цифр
+    const cleanPhone = phone.replace(/\D/g, '');
+
+    // Валидация телефона
+    if (cleanPhone.length !== 10) {
+      alert('Введите корректный номер телефона из 10 цифр');
+      return;
+    }
+
+    const result = await login({ phone: cleanPhone, password });
+
+    if (result.success) {
+      if (result.role === 'ADMIN') {
+        navigate('/admin');
+      } else if (result.role === 'COURIER') {
+        navigate('/courier');
+      } else {
+        navigate('/');
+      }
+    } else {
+      alert(result.message);
+    }
+  };
   return (
     <Layout>
       <Title>Вход</Title>
@@ -39,36 +56,44 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         legend="* — обязательно для заполнения"
       >
-       <div className={styles['login-link']}>
-          <span className={styles['login-link-label']}>Впервые у нас?</span>
+        {/* Ссылка отдельно, вне грида */}
+        <div className={`${styles.loginLink} ${styles.fullWidth}`}>
+          <span className={styles['login-link-label']}>Впервые у нас? </span>
           <Link to="/register" className={styles['login-link-text']}>
             Зарегистрироваться
           </Link>
         </div>
-        <Input
-          label="Телефон:"
-          isPhone
-          value={phone}
-          size="medium"
-          onChange={setPhone}
-          required
-        />
 
-        <Input
-          label="Пароль:"
-          type="password"
-          value={password}
-          size="medium"
-          onChange={setPassword}
-          placeholder="*****"
-          required
-        />
+        {/* Грид только для полей ввода */}
+        <div className={styles.formGrid}>
+          <div className={styles.formRow}>
+            <label htmlFor="phone">Телефон:</label>
+            <Input
+              id="phone"
+              isPhone
+              value={phone}
+              size="phone"
+              onChange={setPhone}
+              required
+            />
+          </div>
 
-        <Button
-          type="submit"
-          text="Вход"
-          className={styles['form-submit']}
-        />
+          <div className={styles.formRow}>
+            <label htmlFor="password">Пароль:</label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              size="medium"
+              onChange={setPassword}
+              placeholder="*****"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Кнопка отдельно, не внутри грида */}
+        <Button type="submit" text="Вход" className={styles.formSubmit} />
       </FormWrapper>
     </Layout>
   );

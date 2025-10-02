@@ -1,19 +1,31 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { Home, Menu as MenuIcon, ShoppingCart, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { NavLink } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import Logo from '../Logo/Logo';
 import styles from './Header.module.css';
 
 export default function Header() {
   const { isAuthenticated, role, logout } = useAuth();
+  const { cart } = useCart(); // берем cart, а не только items
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (err) {
+      console.error('Ошибка при выходе:', err);
+      alert('Не удалось выйти. Попробуйте снова.');
+    }
   };
+
+  // Общая сумма корзины
+  const totalAmount = cart?.items?.reduce(
+    (acc, item) => acc + (item.dish?.price || 0) * (item.quantity || 0),
+    0
+  );
 
   return (
     <header className={styles['site-header']}>
@@ -24,20 +36,40 @@ export default function Header() {
 
         {/* Навигация */}
         <nav className={`${styles.nav} ${styles['header-col']}`}>
-          <NavLink to="/" className={({ isActive }) =>
-            `${styles.navItem} ${isActive ? styles.active : ''}`}>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.active : ''}`
+            }
+          >
             <Home size={20} />
             <span>Главная</span>
           </NavLink>
-          <NavLink to="/menu" className={({ isActive }) =>
-            `${styles.navItem} ${isActive ? styles.active : ''}`}>
+
+          <NavLink
+            to="/menu"
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.active : ''}`
+            }
+          >
             <MenuIcon size={20} />
             <span>Меню</span>
           </NavLink>
-          <NavLink to="/cart" className={({ isActive }) =>
-            `${styles.navItem} ${isActive ? styles.active : ''}`}>
+
+          <NavLink
+            to="/cart"
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.active : ''}` }
+          >
             <ShoppingCart size={20} />
-            <span>Корзина</span>
+            <div className={styles.cartSection}>
+              <span>Корзина</span>
+              {totalAmount > 0 && (
+                <span className={styles.cartTotal}>
+                  {totalAmount.toFixed(2)} ₽
+                </span>
+              )}
+            </div>
           </NavLink>
         </nav>
 
@@ -46,7 +78,10 @@ export default function Header() {
           {isAuthenticated ? (
             <>
               <span className={styles.role}>Роль: {role}</span>
-              <button onClick={handleLogout} className={`${styles.navItem} ${styles.logout}`}>
+              <button
+                onClick={handleLogout}
+                className={`${styles.navItem} ${styles.logout}`}
+              >
                 <LogOut size={18} />
                 <span>Выход</span>
               </button>

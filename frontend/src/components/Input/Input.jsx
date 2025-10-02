@@ -9,16 +9,14 @@ const Input = ({
   size = 'medium',
   isPhone = false,
   className = '',
-  label = '',
-  labelClassName = '',
   required = false,
-  isText = false, // для textarea
-  labelTop = false,
+  isText = false,
+  labelTop = false, // для textarea
 }) => {
   const inputRef = useRef(null);
 
   const formatPhone = (digits) => {
-    const maxLength = 11;
+    const maxLength = 10;
     digits = digits.substring(0, maxLength);
     const template = '(___)-___-__-__'.split('');
     for (let i = 0; i < digits.length; i++) {
@@ -31,91 +29,88 @@ const Input = ({
   const handleChange = (e) => {
     let val = e.target.value;
     if (isPhone) {
-      val = val.replace(/\D/g, '').substring(0, 11);
+      val = val.replace(/\D/g, '').substring(0, 10);
       const formatted = formatPhone(val);
       onChange(formatted);
 
       setTimeout(() => {
         const input = inputRef.current;
         if (input) {
-          const lastDigitIndex = formatted.lastIndexOf(val.slice(-1));
-          input.setSelectionRange(lastDigitIndex + 1, lastDigitIndex + 1);
+          const lastDigitIndex =
+            formatted.indexOf('_') === -1 ? formatted.length : formatted.indexOf('_');
+          input.setSelectionRange(lastDigitIndex, lastDigitIndex);
         }
       }, 0);
-
       return;
     }
-
     onChange(val);
   };
 
   const widthClass = (() => {
     switch (size) {
-      case 'very-short': return styles.veryShort;
-      case 'short': return styles.short;
-      case 'medium': return styles.medium;
-      case 'long': return styles.long;
-      case 'phone': return styles.phone;
-      default: return styles.medium;
+      case 'very-short':
+        return styles['very-short'];
+      case 'short':
+        return styles['short'];
+      case 'medium':
+        return styles['medium'];
+      case 'long':
+        return styles['long'];
+      case 'phone':
+        return styles['phone'];
+      default:
+        return styles['medium'];
     }
   })();
 
   const renderInput = () => {
-    const inputElement = isText ? (
-      <textarea
-        ref={inputRef}
-        value={value}
-        onChange={handleChange}
-        placeholder={placeholder}
-        className={`${styles.input} ${widthClass} ${styles.textarea} ${className}`}
-        maxLength={5000}
-        style={{ height: 'auto' }}
-      />
-    ) : isPhone ? (
-      <div className={`${styles.phoneWrapper} ${className}`}>
-        <span className={styles.phonePrefix}>+7</span>
-        <input
+    if (isText) {
+      return (
+        <textarea
           ref={inputRef}
-          type="tel"
           value={value}
           onChange={handleChange}
-          placeholder="(___)-___-__-__"
-          className={`${styles.input} ${widthClass}`}
+          placeholder={placeholder}
+          className={`${styles.input} ${widthClass} ${styles.textarea} ${className}`}
+          maxLength={5000}
+          style={{ height: 'auto' }}
           required={required}
         />
-      </div>
-    ) : (
-      <input
-        ref={inputRef}
-        type={type}
-        value={value}
-        onChange={handleChange}
-        placeholder={placeholder}
-        className={`${styles.input} ${widthClass} ${className}`}
-        required={required}
-      />
-    );
-
-    if (required) {
+      );
+    } else if (isPhone) {
       return (
-        <div className={styles.inputContainer}>
-          {inputElement}
-          <span className={styles.requiredIndicator}>*</span>
+        <div className={`${styles.phoneWrapper} ${className}`}>
+          <span className={styles.phonePrefix}>+7</span>
+          <input
+            ref={inputRef}
+            type="tel"
+            value={value || '(___)-___-__-__'}
+            onChange={handleChange}
+            placeholder="(___)-___-__-__"
+            className={`${styles.input} ${widthClass}`}
+            required={required}
+          />
         </div>
       );
+    } else {
+      return (
+        <input
+          ref={inputRef}
+          type={type}
+          value={value}
+          onChange={handleChange}
+          placeholder={placeholder}
+          className={`${styles.input} ${widthClass} ${className}`}
+          required={required}
+        />
+      );
     }
-
-    return inputElement;
   };
 
   return (
     <div className={labelTop ? styles.wrapperVertical : styles.wrapper}>
-      {label && (
-        <label className={`${labelTop ? styles.labelTop : styles.label} ${labelClassName}`}>
-          {label}
-        </label>
-      )}
       {renderInput()}
+      {required && <span className={styles.requiredIndicator}>*</span>}
     </div>
   );
 };

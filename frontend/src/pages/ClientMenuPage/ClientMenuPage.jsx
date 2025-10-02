@@ -5,44 +5,43 @@ import { useCart } from '../../context/CartContext';
 import Title from '../../components/Title/Title';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import MenuCard from '../../components/MenuCard/MenuCard';
+import CartToast from '../../components/CartToast/CartToast'; 
 import styles from './ClientMenuPage.module.css';
 
 export default function ClientMenuPage() {
   const [data, setData] = useState({ results: [], count: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null); // ✅ состояние для всплывашки
   const { addItem } = useCart();
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    console.log('ClientMenuPage: Starting to fetch dishes...');
 
     fetchDishes({ is_available: true, ordering: 'name' })
       .then(json => {
-        console.log('ClientMenuPage: Received data:', json);
         if (mounted) {
-          // если API вернёт массив — оборачиваем в {results, count}
           const processedData = Array.isArray(json)
             ? { results: json, count: json.length }
             : json;
-          console.log('ClientMenuPage: Processed data:', processedData);
           setData(processedData);
         }
       })
-      .catch(error => {
-        console.error('ClientMenuPage: Error fetching dishes:', error);
+      .catch(() => {
         if (mounted) setError('Не удалось загрузить меню');
       })
       .finally(() => {
-        console.log('ClientMenuPage: Fetch completed');
         if (mounted) setLoading(false);
       });
 
     return () => { mounted = false; };
   }, []);
 
-  console.log('ClientMenuPage: Render state:', { loading, error, dataCount: data.results.length });
+  const handleAddToCart = (dish, qty = 1) => {
+    addItem(dish.id, qty); // отправляем только id на бэкенд
+    setToast({ item: dish, quantity: qty }); // для всплывашки оставляем весь объект
+  };
 
   return (
     <Layout>
@@ -59,23 +58,27 @@ export default function ClientMenuPage() {
 
       <div className={styles.container}>
         <div className={styles.grid}>
-          {data.results.map(dish => {
-            console.log('ClientMenuPage: Rendering dish:', dish);
-            return (
-              <MenuCard
-                key={dish.id}
-                title={dish.name}
-                image={dish.image}
-                price={dish.price}
-                description={dish.description}
-                calories={dish.calories}
-                dish={dish}
-                onAddToCart={(qty = 1) => addItem(dish, qty)}
-              />
-            );
-          })}
+          {data.results.map(dish => (
+            <MenuCard
+              key={dish.id}
+              title={dish.name}
+              image={dish.image}
+              price={dish.price}
+              description={dish.description}
+              calories={dish.calories}
+              dish={dish}
+              onAddToCart={(qty = 1) => handleAddToCart(dish, qty)}
+            />
+          ))}
         </div>
       </div>
+
+      {/* Всплывашка */}
+      <CartToast
+        item={toast?.item}
+        quantity={toast?.quantity}
+        onClose={() => setToast(null)}
+      />
     </Layout>
   );
 }

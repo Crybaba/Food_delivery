@@ -1,63 +1,40 @@
 .formGrid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr); /* 12 колонок */
-  gap: 16px; /* отступы между ячейками */
-  align-items: start; /* выравнивание по верхнему краю */
+  grid-template-columns: 1fr; /* по умолчанию одна колонка */
+  gap: 12px; /* расстояние между строками */
+  margin-top: 16px;
+  max-width: 500px; /* ограничение ширины формы */
 }
 
-.fullWidth {
-  grid-column: span 12;
-}
-
-.halfWidth {
-  grid-column: span 6;
-}
-
-.thirdWidth {
-  grid-column: span 4;
-}
-
-.quarterWidth {
-  grid-column: span 3;
-}
-
-/* Стили для элементов формы в гриде */
-.formGrid .input-wrapper,
-.formGrid .select-wrapper {
-  display: block;
-  width: 100%;
-}
-.formGrid .input-wrapper .wrapper,
-.formGrid .select-wrapper .wrapper {
+.formRow {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
+  grid-template-columns: 140px 1fr; /* label + поле */
   align-items: center;
-  width: 100%;
+  gap: 12px;
 }
 
-.formGrid .input-wrapper .label,
-.formGrid .select-wrapper .label {
-  text-align: left;
-  white-space: nowrap;
-}
-
-/* Центрированная строка на всю ширину */
-.centerRow {
-  grid-column: span 12;
-  display: flex;
-  justify-content: center;
-}
-
-
-.inlineRow {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.inlineLabel {
-  min-width: 60px !important;
+.formRow label {
   text-align: right;
+  font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.addressSubRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px; /* минимальное расстояние между элементами */
+  flex-wrap: nowrap; /* запрет переноса */
+}
+
+.addressSubRow label {
+  width: auto; /* метки по ширине контента */
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap; /* текст метки не переносится */
+}
+
+.addressSubRow input {
+  flex: 0 0 auto; /* инпуты не растягиваются */
 }

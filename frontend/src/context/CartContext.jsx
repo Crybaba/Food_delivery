@@ -1,49 +1,75 @@
-import React, { createContext, useContext, useMemo, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { fetchCart, addToCart, removeFromCart, clearCart, createOrder } from '../lib/api'; // 👈 добавляем createOrder
+import { useAuth } from './AuthContext';
 
-const CartContext = createContext(null);
+const CartContext = createContext();
 
-export const CartProvider = ({ children }) => {
-  const [items, setItems] = useState(() => {
+export function CartProvider({ children }) {
+  const [cart, setCart] = useState({ items: [], total_price: 0 });
+  const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth();
+
+  async function loadCart() {
+    setLoading(true);
     try {
-      const raw = localStorage.getItem('cart.items');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
+      const data = await fetchCart();
+      setCart(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  });
+  }
 
-  const persist = (next) => {
-    setItems(next);
-    try { localStorage.setItem('cart.items', JSON.stringify(next)); } catch {}
-  };
+  async function addItem(dish_id, quantity = 1) {
+    const data = await addToCart(dish_id, quantity);
+    setCart(data);
+  }
 
-  const addItem = useCallback((dish, quantity = 1) => {
-    persist((prev => {
-      const list = Array.isArray(prev) ? prev : [];
-      const idx = list.findIndex(i => i.id === dish.id);
-      if (idx >= 0) {
-        const copy = [...list];
-        copy[idx] = { ...copy[idx], quantity: copy[idx].quantity + quantity };
-        return copy;
-      }
-      return [...list, { id: dish.id, name: dish.name, price: dish.price, image: dish.image, quantity }];
-    })(items));
-  }, [items]);
+  async function removeItem(dish_id) {
+    const data = await removeFromCart(dish_id);
+    setCart(data);
+  }
 
-  const removeItem = useCallback((dishId) => {
-    persist(items.filter(i => i.id !== dishId));
-  }, [items]);
+  async function clearAll() {
+    const data = await clearCart();
+    setCart(data);
+  }
 
-  const clear = useCallback(() => persist([]), []);
+  async function makeOrder(orderData) {
+    try {
+      const order = await createOrder(orderData);
+      await clearAll(); // очистка корзины после успешного заказа
+      return order;
+    } catch (err) {
+      console.error("Ошибка оформления заказа:", err);
+      throw err;
+    }
+  }
 
-  const value = useMemo(() => ({ items, addItem, removeItem, clear }), [items, addItem, removeItem, clear]);
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
-};
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadCart();
+    } else {
+      setCart({ items: [], total_price: 0 });
+    }
+  }, [isAuthenticated]);
 
-export const useCart = () => {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be used within CartProvider');
-  return ctx;
-};
+  return (
+    <CartContext.Provider
+      value={{
+        cart,
+        loading,
+        addItem,
+        removeItem,
+        clearAll,
+        reload: loadCart,
+        makeOrder // 👈 теперь доступно на фронте
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
+}
 
-
+export const useCart = () => useContext(CartContext);

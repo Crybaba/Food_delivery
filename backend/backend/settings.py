@@ -29,6 +29,7 @@ else:
 INSTALLED_APPS = [
     'menu',
     'accounts',
+    'orders',
     'corsheaders',
     'rest_framework',
     'django_filters',

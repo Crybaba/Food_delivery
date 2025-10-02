@@ -18,8 +18,6 @@ export default function Footer() {
         <div className={styles.footerCenter}>
           Доставка <strong>возможна</strong> при заказе от{' '}
           <span className={styles.highlight}>1000 руб.</span>
-          <br />
-          Стоимость доставки: <span className={styles.highlight}>2.4%</span> от стоимости заказа
         </div>
 
         <div className={styles.footerRight}>
