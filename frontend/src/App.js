@@ -6,6 +6,7 @@ import AdminHomePage from './pages/AdminHomePage/AdminHomePage';
 import AdminOrdersPage from './pages/AdminOrdersPage/AdminOrdersPage';
 import AdminCouriersPage from './pages/AdminCouriersPage/AdminCouriersPage';
 import AdminDishesPage from './pages/AdminDishesPage/AdminDishesPage';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage/AdminAnalyticsPage';
 import ClientHomePage from './pages/ClientHomePage/ClientHomePage';
 import CourierHomePage from './pages/CourierHomePage/CourierHomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -87,6 +88,15 @@ export default function App() {
               element={
                 <RoleRoute allow={['ADMIN']}>
                   <AdminDishesPage />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/admin/analytics"
+              element={
+                <RoleRoute allow={['ADMIN']}>
+                  <AdminAnalyticsPage />
                 </RoleRoute>
               }
             />

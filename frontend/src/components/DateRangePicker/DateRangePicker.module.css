@@ -1,8 +1,11 @@
 .wrapper {
-  display: inline-flex;           /* чтобы компонент вел себя как Select */
-  align-items: center;            /* выравниваем по центру с селектами */
-  gap: 8px;                       /* расстояние между меткой и полями */
-  vertical-align: middle;         /* дополнительное выравнивание */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .inputs {
@@ -10,31 +13,31 @@
   align-items: center;
   gap: 6px;
   flex-wrap: nowrap;
+  width: 100%;
 }
 
 .inputContainer {
   position: relative;
-  display: inline-block;
-  width: 100%;
+  display: inline-flex;
+  flex: 1 1 auto; /* адаптивная ширина */
+  min-width: 0;   /* чтобы не ломалось при узком контейнере */
 }
 
-/* Основной стиль поля (в точности как у Select) */
 .input {
   padding: 8px 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  font-size: 16px;
+  font-size: 15px;
   background: var(--color-bg);
   color: var(--color-ink);
   width: 100%;
-  box-sizing: border-box;
   height: 38px;
   line-height: 1.4;
+  box-sizing: border-box;
   appearance: none;
-  vertical-align: middle;
+  flex-shrink: 1; /* не раздувает поле */
 }
 
-/* Иконка календаря */
 .input::-webkit-calendar-picker-indicator {
   cursor: pointer;
   filter: opacity(0.6);
@@ -55,4 +58,5 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 38px;
+  flex-shrink: 0;
 }

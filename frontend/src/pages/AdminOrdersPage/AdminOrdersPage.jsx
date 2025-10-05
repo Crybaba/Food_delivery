@@ -111,6 +111,14 @@ export default function AdminOrdersPage() {
         { key: 'status', label: 'Статус', width: '150px' },
     ];
 
+    const statusMap = {
+        processing: 'В обработке',
+        preparing: 'Готовится',
+        delivering: 'Доставляется',
+        completed: 'Завершён',
+        cancelled: 'Отменён',
+    };
+
     const data = filteredOrders.map(order => ({
         id: (
             <button
@@ -123,8 +131,10 @@ export default function AdminOrdersPage() {
         user_name: order.user_name,
         courier_name: order.courier_name || '—',
         created_at: new Date(order.created_at).toLocaleString(),
-        total: order.items.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0).toFixed(2),
-        status: order.status,
+        total: order.items
+            .reduce((sum, i) => sum + Number(i.price) * i.quantity, 0)
+            .toFixed(2),
+        status: statusMap[order.status] || 'Неизвестен',
         courier: order.courier || null,
     }));
 

@@ -35,21 +35,28 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     user_name = serializers.SerializerMethodField(read_only=True)
     courier_name = serializers.SerializerMethodField(read_only=True)
+    user_gender = serializers.SerializerMethodField(read_only=True)  # 👈 добавляем сюда
 
     class Meta:
         model = Order
         fields = [
-            'id', 'user', 'user_name', 'pickup', 'street', 'house', 'entrance', 'flat',
+            'id', 'user', 'user_name', 'user_gender', 'pickup', 'street', 'house', 'entrance', 'flat',
             'intercom', 'phone', 'persons', 'comment', 'payment', 'status',
             'courier', 'courier_name', 'created_at', 'updated_at', 'items'
         ]
-        read_only_fields = ['status', 'courier', 'created_at', 'updated_at', 'user_name', 'courier_name']
+        read_only_fields = [
+            'status', 'courier', 'created_at', 'updated_at',
+            'user_name', 'courier_name', 'user_gender'
+        ]
 
     def get_user_name(self, obj):
         if obj.user:
             parts = [obj.user.surname, obj.user.name, obj.user.patronymic]
             return ' '.join(p for p in parts if p).strip() or obj.user.phone
         return ""
+
+    def get_user_gender(self, obj):
+        return getattr(obj.user, "gender", None)
 
     def get_courier_name(self, obj):
         if obj.courier:
@@ -63,3 +70,4 @@ class OrderSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
         return order
+

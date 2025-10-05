@@ -11,7 +11,6 @@ import {
     createDish,
     updateDish,
     deleteDish,
-    toggleDishAvailability,
 } from '../../lib/api';
 import styles from './AdminDishesPage.module.css';
 

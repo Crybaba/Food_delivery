@@ -46,11 +46,19 @@ export default function ClientOrdersPage() {
     { key: 'status', label: 'Статус', align: 'left', width: '150px' },
   ];
 
+  const statusMap = {
+    processing: 'В обработке',
+    preparing: 'Готовится',
+    delivering: 'Доставляется',
+    completed: 'Завершён',
+    cancelled: 'Отменён',
+  };
+
   const data = filteredOrders.map(order => ({
     id: order.id,
     created_at: new Date(order.created_at).toLocaleString(),
     total: order.items.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0).toFixed(2),
-    status: order.status,
+    status: statusMap[order.status] || 'Неизвестен',
     onClick: () => setSelectedOrder(order),
   }));
 
