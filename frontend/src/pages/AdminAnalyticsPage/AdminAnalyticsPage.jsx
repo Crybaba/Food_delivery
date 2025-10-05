@@ -18,6 +18,35 @@ export default function AdminAnalyticsPage() {
     const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
     const [chartData, setChartData] = useState([]);
 
+    const CATEGORY_CHOICES = [
+        { value: 'hot', label: 'Горячие блюда' },
+        { value: 'japan', label: 'Япония' },
+        { value: 'china', label: 'Китай' },
+        { value: 'korea', label: 'Корея' },
+        { value: 'vietnam', label: 'Вьетнам' },
+        { value: 'thai', label: 'Таиланд' },
+        { value: 'asia', label: 'Остальная Азия' },
+        { value: 'snack', label: 'Закуски' },
+        { value: 'drink', label: 'Напитки' },
+        { value: 'soups', label: 'Супы' },
+        { value: 'salads', label: 'Салаты' },
+        { value: 'pizza', label: 'Пицца' },
+        { value: 'dessert', label: 'Десерты' },
+        { value: 'other', label: 'Прочее' },
+    ];
+
+    // Обратный словарь: label -> value
+    const CATEGORY_REVERSE = CATEGORY_CHOICES.reduce((acc, { value, label }) => {
+        acc[label.toLowerCase()] = value;
+        return acc;
+    }, {});
+
+    // --- Вместо CATEGORY_MAP ---
+    const CATEGORY_LABELS = CATEGORY_CHOICES.reduce((acc, { value, label }) => {
+        acc[value] = label;
+        return acc;
+    }, {});
+
     useEffect(() => {
         async function loadData() {
             setLoading(true);
@@ -34,12 +63,10 @@ export default function AdminAnalyticsPage() {
         loadData();
     }, []);
 
-    // Формирование данных графика
     useEffect(() => {
-        if (orders.length === 0) return;
+        if (!orders.length) return;
 
         const filtered = orders.filter(o => {
-            if (!dateRange.startDate && !dateRange.endDate) return true;
             const date = new Date(o.created_at);
             const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
             const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
@@ -55,7 +82,6 @@ export default function AdminAnalyticsPage() {
         let data = [];
 
         switch (chartType) {
-            // Популярность блюд
             case 'popularity': {
                 const dishMap = {};
                 filtered.forEach(order =>
@@ -67,7 +93,6 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
-            // Кол-во заказов за день
             case 'countByDay': {
                 const map = {};
                 filtered.forEach(order => {
@@ -78,7 +103,6 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
-            // Средняя сумма заказа за день
             case 'avgByDay': {
                 const map = {};
                 filtered.forEach(order => {
@@ -95,7 +119,6 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
-            // По времени суток
             case 'byTime': {
                 const map = { '00–06': 0, '06–12': 0, '12–18': 0, '18–24': 0 };
                 filtered.forEach(order => {
@@ -109,7 +132,6 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
-            // Самовывоз / доставка
             case 'pickupVsDelivery': {
                 let pickup = 0, delivery = 0;
                 filtered.forEach(o => (o.pickup ? pickup++ : delivery++));
@@ -120,7 +142,6 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
-            // 💳 Способ оплаты
             case 'paymentMethod': {
                 const map = {};
                 filtered.forEach(order => {
@@ -138,17 +159,13 @@ export default function AdminAnalyticsPage() {
 
             case 'genderDistribution': {
                 const map = { male: 0, female: 0, unknown: 0 };
-
                 filtered.forEach(order => {
                     const raw = (order.user_gender || '').toLowerCase();
-
                     let gender = 'unknown';
                     if (raw === 'м' || raw === 'male') gender = 'male';
                     else if (raw === 'ж' || raw === 'female') gender = 'female';
-
                     map[gender]++;
                 });
-
                 data = [
                     { name: 'Мужчины', value: map.male },
                     { name: 'Женщины', value: map.female },
@@ -157,11 +174,10 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
-            // 📅 По дням недели
             case 'byWeekday': {
                 const map = { Пн: 0, Вт: 0, Ср: 0, Чт: 0, Пт: 0, Сб: 0, Вс: 0 };
                 filtered.forEach(o => {
-                    const day = new Date(o.created_at).getDay(); // 0 = воскресенье
+                    const day = new Date(o.created_at).getDay();
                     const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
                     map[dayNames[day]]++;
                 });
@@ -169,6 +185,21 @@ export default function AdminAnalyticsPage() {
                 break;
             }
 
+            // НОВАЯ ОПЦИЯ: по категориям блюд
+            case 'byCategory': {
+                const map = {};
+                filtered.forEach(order => {
+                    order.items.forEach(i => {
+                        const cat = i.dish.category || 'other'; // ожидаем, что backend отдаёт 'china', 'japan', ...
+                        map[cat] = (map[cat] || 0) + i.quantity;
+                    });
+                });
+                data = Object.entries(map).map(([cat, count]) => ({
+                    name: CATEGORY_LABELS[cat] || cat,
+                    count
+                }));
+                break;
+            }
             default:
                 data = [];
         }
@@ -176,7 +207,7 @@ export default function AdminAnalyticsPage() {
         setChartData(data);
     }, [chartType, dateRange, orders]);
 
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#845EC2'];
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#845EC2', '#FF6666', '#AA00FF'];
 
     return (
         <Layout>
@@ -198,6 +229,8 @@ export default function AdminAnalyticsPage() {
                                 { value: 'pickupVsDelivery', label: 'Доставка / самовывоз' },
                                 { value: 'paymentMethod', label: 'Способ оплаты' },
                                 { value: 'genderDistribution', label: 'По полу пользователей' },
+                                { value: 'byWeekday', label: 'По дням недели' },
+                                { value: 'byCategory', label: 'По категориям блюд' },
                             ]}
                         />
                     </div>
@@ -226,12 +259,13 @@ export default function AdminAnalyticsPage() {
                                     case 'avgByDay':
                                     case 'byTime':
                                     case 'byWeekday':
+                                    case 'byCategory':
                                         return (
                                             <BarChart data={chartData}>
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis
                                                     dataKey={
-                                                        chartType === 'popularity'
+                                                        chartType === 'popularity' || chartType === 'byCategory'
                                                             ? 'name'
                                                             : chartType === 'byTime'
                                                                 ? 'range'

@@ -16,6 +16,16 @@
     object-fit: cover;
 }
 
+.textarea {
+    width: 100%;
+    font-family: var(--font-main);
+    max-height: 80px;
+    overflow-y: auto;
+    resize: none;
+    box-sizing: border-box;
+    border-radius: var(--radius-sm);
+}
+
 
 .modal {
     background: var(--color-bg);

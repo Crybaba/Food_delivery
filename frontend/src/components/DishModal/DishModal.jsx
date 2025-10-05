@@ -2,6 +2,25 @@ import React, { useEffect, useState } from 'react';
 import styles from './DishModal.module.css';
 import Input from '../Input/Input';
 import Button from '../Button/Button';
+import Select from '../Select/Select';
+
+// Локальная копия CATEGORY_CHOICES
+const CATEGORY_CHOICES = [
+  { value: 'hot', label: 'Горячие блюда' },
+  { value: 'japan', label: 'Япония' },
+  { value: 'china', label: 'Китай' },
+  { value: 'korea', label: 'Корея' },
+  { value: 'vietnam', label: 'Вьетнам' },
+  { value: 'thai', label: 'Таиланд' },
+  { value: 'asia', label: 'Остальная Азия' },
+  { value: 'snack', label: 'Закуски' },
+  { value: 'drink', label: 'Напитки' },
+  { value: 'soups', label: 'Супы' },
+  { value: 'salads', label: 'Салаты' },
+  { value: 'pizza', label: 'Пицца' },
+  { value: 'dessert', label: 'Десерты' },
+  { value: 'other', label: 'Прочее' },
+];
 
 export default function DishModal({ dish, onClose, onSave, loading }) {
   const [name, setName] = useState('');
@@ -12,8 +31,8 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
   const [isAvailable, setIsAvailable] = useState(true);
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState('');
+  const [category, setCategory] = useState('other');
 
-  // Заполняем поля при редактировании
   useEffect(() => {
     if (dish) {
       setName(dish.name || '');
@@ -22,12 +41,11 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
       setWeight(dish.weight || '');
       setCalories(dish.calories || '');
       setIsAvailable(dish.is_available ?? true);
+      setCategory(dish.category || 'other');
 
-      // Проверяем поле изображения
       if (dish.image_url) {
         setPreview(dish.image_url);
       } else if (dish.image) {
-        // иногда сервер может возвращать просто "image" с путём
         const fullUrl = dish.image.startsWith('http')
           ? dish.image
           : `${window.location.origin}${dish.image}`;
@@ -36,7 +54,6 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
         setPreview('');
       }
     } else {
-      // Очистка полей при добавлении нового блюда
       setName('');
       setDescription('');
       setPrice('');
@@ -45,6 +62,7 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
       setIsAvailable(true);
       setImage(null);
       setPreview('');
+      setCategory('other');
     }
   }, [dish]);
 
@@ -58,6 +76,7 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
     fd.append('weight', weight);
     fd.append('calories', calories);
     fd.append('is_available', isAvailable);
+    fd.append('category', category);
     if (image) fd.append('image', image);
 
     onSave(fd);
@@ -72,6 +91,7 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
         <h2>{dish?.id ? 'Редактировать блюдо' : 'Добавить блюдо'}</h2>
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Название */}
           <div className={styles.formRow}>
             <label htmlFor="name">Название:</label>
             <div className={styles.rowInput}>
@@ -86,21 +106,35 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
             </div>
           </div>
 
+          {/* Категория через твой Select */}
           <div className={styles.formRow}>
-            <label htmlFor="description">Описание:</label>
+            <label htmlFor="category">Категория:</label>
             <div className={styles.rowInput}>
-              <Input
-                id="description"
-                value={description}
+              <Select
+                value={category}
+                onChange={setCategory}
+                options={CATEGORY_CHOICES}
                 size="long"
-                onChange={setDescription}
-                placeholder="Введите описание"
                 required
-                textarea
               />
             </div>
           </div>
 
+          {/* Описание */}
+          <div className={styles.formRow}>
+            <label htmlFor="description">Описание:</label>
+            <div className={styles.rowInput}>
+              <textarea className={styles.textarea}
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Введите описание"
+                rows={4}
+              />
+            </div>
+          </div>
+
+          {/* Цена */}
           <div className={styles.formRow}>
             <label htmlFor="price">Цена:</label>
             <div className={styles.rowInput}>
@@ -116,6 +150,7 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
             </div>
           </div>
 
+          {/* Вес */}
           <div className={styles.formRow}>
             <label htmlFor="weight">Вес (г):</label>
             <div className={styles.rowInput}>
@@ -130,6 +165,7 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
             </div>
           </div>
 
+          {/* Калории */}
           <div className={styles.formRow}>
             <label htmlFor="calories">Ккал:</label>
             <div className={styles.rowInput}>
@@ -144,15 +180,12 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
             </div>
           </div>
 
+          {/* Изображение */}
           <div className={styles.formRow}>
             <label htmlFor="image">Изображение:</label>
             <div className={styles.rowInput}>
               {preview && (
-                <img
-                  src={preview}
-                  alt="Превью"
-                  className={styles.previewImage}
-                />
+                <img src={preview} alt="Превью" className={styles.previewImage} />
               )}
               <input
                 id="image"
@@ -169,6 +202,7 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
             </div>
           </div>
 
+          {/* Доступно */}
           <div className={styles.formRow}>
             <label htmlFor="isAvailable">Доступно:</label>
             <div className={styles.rowInput}>
@@ -183,18 +217,8 @@ export default function DishModal({ dish, onClose, onSave, loading }) {
           </div>
 
           <div className={styles.actions}>
-            <Button
-              text="Сохранить"
-              color="orange"
-              type="submit"
-              disabled={loading}
-            />
-            <Button
-              text="Отмена"
-              color="gray"
-              onClick={onClose}
-              disabled={loading}
-            />
+            <Button text="Сохранить" color="orange" type="submit" disabled={loading} />
+            <Button text="Отмена" color="gray" onClick={onClose} disabled={loading} />
           </div>
         </form>
       </div>

@@ -5,14 +5,14 @@ import { useCart } from '../../context/CartContext';
 import Title from '../../components/Title/Title';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import MenuCard from '../../components/MenuCard/MenuCard';
-import CartToast from '../../components/CartToast/CartToast'; 
+import CartToast from '../../components/CartToast/CartToast';
 import styles from './ClientMenuPage.module.css';
 
 export default function ClientMenuPage() {
-  const [data, setData] = useState({ results: [], count: 0 });
+  const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState(null); // ✅ состояние для всплывашки
+  const [toast, setToast] = useState(null);
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -21,12 +21,10 @@ export default function ClientMenuPage() {
 
     fetchDishes({ is_available: true, ordering: 'name' })
       .then(json => {
-        if (mounted) {
-          const processedData = Array.isArray(json)
-            ? { results: json, count: json.length }
-            : json;
-          setData(processedData);
-        }
+        if (!mounted) return;
+        // API может вернуть массив или объект с results
+        const list = Array.isArray(json) ? json : json.results || [];
+        setDishes(list);
       })
       .catch(() => {
         if (mounted) setError('Не удалось загрузить меню');
@@ -39,9 +37,39 @@ export default function ClientMenuPage() {
   }, []);
 
   const handleAddToCart = (dish, qty = 1) => {
-    addItem(dish.id, qty); // отправляем только id на бэкенд
-    setToast({ item: dish, quantity: qty }); // для всплывашки оставляем весь объект
+    addItem(dish.id, qty);
+    setToast({ item: dish, quantity: qty });
   };
+
+  const categoryNames = {
+    japan: 'Япония',
+    china: 'Китай',
+    chinese: 'Китай',
+    korea: 'Корея',
+    vietnam: 'Вьетнам',
+    thai: 'Таиланд',
+    asia: 'Остальная Азия',
+    hot: 'Горячие блюда',
+    snacks: 'Закуски',
+    snack: 'Закуски',
+    drinks: 'Напитки',
+    drink: 'Напитки',
+    soups: 'Супы',
+    salads: 'Салаты',
+    pizza: 'Пицца',
+    desserts: 'Десерты',
+    other: 'Прочее',
+  };
+
+
+  const grouped = dishes.reduce((acc, dish) => {
+    const rawCat = (dish.category || 'other').toLowerCase();
+    const cat = categoryNames[rawCat] || (rawCat.charAt(0).toUpperCase() + rawCat.slice(1));
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(dish);
+    return acc;
+  }, {});
+
 
   return (
     <Layout>
@@ -49,32 +77,42 @@ export default function ClientMenuPage() {
       <Breadcrumbs
         items={[
           { label: 'Главная', to: '/' },
-          { label: 'Меню' }
+          { label: 'Меню' },
         ]}
       />
 
       {loading && <p className="text-center">Загрузка…</p>}
       {error && <p className="text-center" style={{ color: 'var(--accent)' }}>{error}</p>}
 
-      <div className={styles.container}>
-        <div className={styles.grid}>
-          {data.results.map(dish => (
-            <MenuCard
-              key={dish.id}
-              title={dish.name}
-              image={dish.image}
-              price={dish.price}
-              description={dish.description}
-              weight={dish.weight}
-              calories={dish.calories}
-              dish={dish}
-              onAddToCart={(qty = 1) => handleAddToCart(dish, qty)}
-            />
+      {!loading && !error && (
+        <div className={styles.container}>
+          {Object.keys(grouped).length === 0 && (
+            <p className="text-center">Меню пока пусто</p>
+          )}
+
+          {Object.keys(grouped).map(cat => (
+            <section key={cat} className={styles.categorySection}>
+              <h2 className={styles.categoryTitle}>{cat}</h2>
+              <div className={styles.grid}>
+                {grouped[cat].map(dish => (
+                  <MenuCard
+                    key={dish.id}
+                    title={dish.name}
+                    image={dish.image}
+                    price={dish.price}
+                    description={dish.description}
+                    weight={dish.weight}
+                    calories={dish.calories}
+                    dish={dish}
+                    onAddToCart={(qty = 1) => handleAddToCart(dish, qty)}
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
-      </div>
+      )}
 
-      {/* Всплывашка */}
       <CartToast
         item={toast?.item}
         quantity={toast?.quantity}

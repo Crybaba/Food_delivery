@@ -8,18 +8,15 @@ from .models import Dish
 from .serializers import DishSerializer, DishCreateSerializer, DishUpdateSerializer
 
 class DishViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet для управления блюдами.
-    Поддерживает все CRUD операции: создание, чтение, обновление, удаление.
-    """
     queryset = Dish.objects.all()
     serializer_class = DishSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['is_available']
+    filterset_fields = ['is_available', 'category']  # добавили category
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'price', 'created_at', 'calories']
     ordering = ['-created_at']
+
     
     def get_serializer_class(self):
         """Выбор сериализатора в зависимости от действия"""

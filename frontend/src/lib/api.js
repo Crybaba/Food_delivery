@@ -21,22 +21,28 @@ async function ensureCsrf() {
 /**
  * Универсальный fetch с CSRF и сессиями
  */
-async function fetchWithCsrf(url, options = {}) {
-  const csrf = getCsrfToken();
-  options.headers = {
-    'Content-Type': 'application/json',
-    'X-CSRFToken': csrf,
-    ...options.headers
-  };
-  options.credentials = 'include';
-  const res = await fetch(url, options);
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Ошибка запроса ${res.status}: ${text}`);
-  }
-  return res.json();
-}
+export async function fetchWithCsrf(url, options = {}) {
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrfToken(),
+      ...options.headers,
+    },
+    credentials: 'include',
+  });
 
+  let data = null;
+  try {
+    const text = await res.text();
+    if (text) data = JSON.parse(text);
+  } catch (e) {
+    data = null;
+  }
+
+  if (!res.ok) throw new Error(data?.detail || `Ошибка запроса ${res.status}`);
+  return data;
+}
 
 // -----------------
 // Текущий пользователь
@@ -50,11 +56,19 @@ export async function fetchCurrentUser() {
 // -----------------
 export async function loginUser({ phone, password }) {
   await ensureCsrf();
-  return fetchWithCsrf(`${BASE_URL}/accounts/login/`, {
+  const res = await fetch(`${BASE_URL}/accounts/login/`, {
     method: 'POST',
-    body: JSON.stringify({ phone, password })
+    body: JSON.stringify({ phone, password }),
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrfToken(),
+    },
+    credentials: 'include', // <-- обязательно
   });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
+
 
 export async function registerUser({ surname, name, patronymic, phone, password, gender }) {
   await ensureCsrf();
@@ -99,8 +113,16 @@ export async function clearCart() {
 // -----------------
 export async function fetchDishes() {
   // GET запрос можно делать напрямую через fetchWithCsrf для единообразия
-  return fetchWithCsrf(`${BASE_URL}/menu/dishes/`, { method: 'GET' })
-    .then(data => data.results || []);
+  let url = `${BASE_URL}/menu/dishes/?is_available=true&ordering=name`;
+  let all = [];
+
+  while (url) {
+    const resp = await fetchWithCsrf(url, { method: 'GET' });
+    all = all.concat(resp.results || []);
+    url = resp.next; // если next есть, идём на следующую страницу
+  }
+
+  return all;
 }
 
 export async function createDish(formData) {
@@ -117,6 +139,13 @@ export async function createDish(formData) {
   return res.json();
 }
 
+export async function deleteDish(id) {
+  await ensureCsrf(); // убедимся, что CSRF есть
+  return fetchWithCsrf(`${BASE_URL}/menu/dishes/${id}/`, {
+    method: 'DELETE'
+  });
+}
+
 export async function updateDish(id, formData) {
   await ensureCsrf();
   const res = await fetch(`${BASE_URL}/menu/dishes/${id}/`, {
@@ -131,11 +160,6 @@ export async function updateDish(id, formData) {
   return res.json();
 }
 
-
-export async function deleteDish(id) {
-  await ensureCsrf();
-  return fetchWithCsrf(`${BASE_URL}/menu/dishes/${id}/`, { method: 'DELETE' });
-}
 
 export async function toggleDishAvailability(id) {
   await ensureCsrf();

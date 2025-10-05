@@ -8,7 +8,7 @@ from accounts.models import User
 class DishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
-        fields = ['id', 'name', 'price']
+        fields = ['id', 'name', 'price', 'category']
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

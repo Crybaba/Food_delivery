@@ -19,11 +19,29 @@ export default function AdminDishesPage() {
     const [loading, setLoading] = useState(true);
     const [selectedDish, setSelectedDish] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
-    const [availabilityFilter, setAvailabilityFilter] = useState(''); // '' | 'available' | 'unavailable'
+    const [availabilityFilter, setAvailabilityFilter] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState(''); // новый фильтр по категории
 
-    // ---------------------------
-    // Загрузка блюд
-    // ---------------------------
+    const CATEGORY_CHOICES = [
+        { value: 'hot', label: 'Горячие блюда' },
+        { value: 'japan', label: 'Япония' },
+        { value: 'china', label: 'Китай' },
+        { value: 'korea', label: 'Корея' },
+        { value: 'vietnam', label: 'Вьетнам' },
+        { value: 'thai', label: 'Таиланд' },
+        { value: 'asia', label: 'Остальная Азия' },
+        { value: 'snack', label: 'Закуски' },
+        { value: 'drink', label: 'Напитки' },
+        { value: 'soups', label: 'Супы' },
+        { value: 'salads', label: 'Салаты' },
+        { value: 'pizza', label: 'Пицца' },
+        { value: 'dessert', label: 'Десерты' },
+        { value: 'other', label: 'Прочее' },
+    ];
+
+
+    const categoryMap = Object.fromEntries(CATEGORY_CHOICES.map(c => [c.value, c.label]));
+
     const loadDishes = async () => {
         setLoading(true);
         try {
@@ -40,9 +58,6 @@ export default function AdminDishesPage() {
         loadDishes();
     }, []);
 
-    // ---------------------------
-    // Сохранение блюда
-    // ---------------------------
     const handleSave = async (formData) => {
         setActionLoading(true);
         try {
@@ -61,9 +76,6 @@ export default function AdminDishesPage() {
         }
     };
 
-    // ---------------------------
-    // Удаление блюда
-    // ---------------------------
     const handleDelete = async (id) => {
         if (!window.confirm('Удалить блюдо?')) return;
         setActionLoading(true);
@@ -79,19 +91,18 @@ export default function AdminDishesPage() {
     };
 
     // ---------------------------
-    // Фильтруем по доступности
+    // Фильтруем по доступности и категории
     // ---------------------------
     const filteredDishes = dishes.filter(dish => {
-        if (availabilityFilter === 'available') return dish.is_available;
-        if (availabilityFilter === 'unavailable') return !dish.is_available;
+        if (availabilityFilter === 'available' && !dish.is_available) return false;
+        if (availabilityFilter === 'unavailable' && dish.is_available) return false;
+        if (categoryFilter && dish.category !== categoryFilter) return false;
         return true;
     });
 
-    // ---------------------------
-    // Колонки таблицы
-    // ---------------------------
     const columns = [
         { key: 'name', label: 'Название', width: '180px' },
+        { key: 'category', label: 'Категория', width: '120px', align: 'center' },
         { key: 'description', label: 'Описание', width: '300px' },
         { key: 'price', label: 'Цена', width: '100px', align: 'right' },
         { key: 'weight', label: 'Вес (г)', width: '100px', align: 'right' },
@@ -102,13 +113,12 @@ export default function AdminDishesPage() {
 
     const data = filteredDishes.map(dish => ({
         ...dish,
+        category: categoryMap[dish.category] || 'Другое',
         price: `${dish.price} ₽`,
         weight: `${dish.weight} г`,
         calories: `${dish.calories} ккал`,
         is_available: dish.is_available ? 'В наличии' : 'Недоступно',
-        description: (
-            <div className={styles.comment}>{dish.description}</div>
-        ),
+        description: <div className={styles.comment}>{dish.description}</div>,
         actions: (
             <div className={styles.buttons}>
                 <Button
@@ -136,7 +146,6 @@ export default function AdminDishesPage() {
             <Breadcrumbs items={[{ label: 'Главная', to: '/admin' }, { label: 'Управление блюдами' }]} />
 
             <div className={styles.toolSection}>
-                {/* ----------------- фильтры ----------------- */}
                 <div className={styles.filterSection}>
                     <div className={styles.filterItem}>
                         <label>Фильтр по доступности:</label>
@@ -151,7 +160,18 @@ export default function AdminDishesPage() {
                             ]}
                         />
                     </div>
+
+                    <div className={styles.filterItem}>
+                        <label>Фильтр по категории:</label>
+                        <Select
+                            value={categoryFilter}
+                            onChange={setCategoryFilter}
+                            size="medium"
+                            options={[{ value: '', label: 'Все' }, ...CATEGORY_CHOICES]}
+                        />
+                    </div>
                 </div>
+
                 <Button
                     text="Добавить блюдо"
                     size="medium"
