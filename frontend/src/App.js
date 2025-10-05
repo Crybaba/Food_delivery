@@ -3,6 +3,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
 import AdminHomePage from './pages/AdminHomePage/AdminHomePage';
+import AdminOrdersPage from './pages/AdminOrdersPage/AdminOrdersPage';
+import AdminCouriersPage from './pages/AdminCouriersPage/AdminCouriersPage';
+import AdminDishesPage from './pages/AdminDishesPage/AdminDishesPage';
 import ClientHomePage from './pages/ClientHomePage/ClientHomePage';
 import CourierHomePage from './pages/CourierHomePage/CourierHomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -11,18 +14,36 @@ import ClientMenuPage from './pages/ClientMenuPage/ClientMenuPage';
 import ClientOrdersPage from './pages/ClientOrdersPage/ClientOrdersPage';
 import ClientCartPage from './pages/ClientCartPage/ClientCartPage';
 
-// Ограничение маршрутов по роли
-function RoleRoute({ allow, children }) {
-  const { isAuthenticated, role } = useAuth();
+// Компонент редиректа по роли с "/"
+function RoleRedirect() {
+  const { isAuthenticated, role, loading } = useAuth();
 
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (loading) return <p>Загрузка...</p>; // или спиннер
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  // Редиректим админа на /admin
+  if (role === 'ADMIN') return <Navigate to="/admin" replace />;
+
+  // Курьера на /courier
+  if (role === 'COURIER') return <Navigate to="/courier" replace />;
+
+  // Остальные роли или клиент остаются на главной
+  return <ClientHomePage />;
+}
+
+function RoleRoute({ allow, children }) {
+  const { isAuthenticated, role, loading } = useAuth();
+
+  if (loading) return <p>Загрузка...</p>; // или спиннер
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (!allow.includes(role)) return <Navigate to="/" replace />;
   return children;
 }
 
-// Приватный маршрут: доступен только авторизованным
 function PrivateRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <p>Загрузка...</p>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return children;
 }
@@ -33,7 +54,10 @@ export default function App() {
       <CartProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<ClientHomePage />} />
+            {/* Главная с редиректом по роли */}
+            <Route path="/" element={<RoleRedirect />} />
+
+            {/* Админские маршруты */}
             <Route
               path="/admin"
               element={
@@ -43,6 +67,32 @@ export default function App() {
               }
             />
             <Route
+              path="/admin/orders"
+              element={
+                <RoleRoute allow={['ADMIN']}>
+                  <AdminOrdersPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/couriers"
+              element={
+                <RoleRoute allow={['ADMIN']}>
+                  <AdminCouriersPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/dishes"
+              element={
+                <RoleRoute allow={['ADMIN']}>
+                  <AdminDishesPage />
+                </RoleRoute>
+              }
+            />
+
+            {/* Курьерские маршруты */}
+            <Route
               path="/courier"
               element={
                 <RoleRoute allow={['COURIER']}>
@@ -50,8 +100,12 @@ export default function App() {
                 </RoleRoute>
               }
             />
+
+            {/* Авторизация и регистрация */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* Клиентские страницы */}
             <Route path="/menu" element={<ClientMenuPage />} />
             <Route path="/orders" element={<ClientOrdersPage />} />
             <Route

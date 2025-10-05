@@ -1,24 +1,22 @@
 .form {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
-  padding: 0 16px;
 }
 
 .form-card {
-  padding: 20px;
+  padding: 10px;
   border: 2px dotted var(--color-border);
   background: var(--color-bg-muted);
   border-radius: var(--radius-sm);
-  width: 100%;
-  max-width: 550px;
+  width: fit-content;
+  max-width: 800px;
 }
 
 .form-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 20px 0;
+  gap: 5px;
+  margin-top: 16px;
 }
 
 .form-legend {

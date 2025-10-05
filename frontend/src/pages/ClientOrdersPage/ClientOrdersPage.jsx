@@ -59,20 +59,22 @@ export default function ClientOrdersPage() {
       <Title>Мои заказы</Title>
       <Breadcrumbs items={[{ label: 'Главная', to: '/' }, { label: 'Мои заказы' }]} />
 
-      <div style={{ marginBottom: 16 }}>
-        <label>Фильтр по статусу: </label>
-        <Select
-          value={statusFilter}
-          onChange={setStatusFilter}
-          size="medium"
-          options={[
-            { value: '', label: 'Все' },
-            { value: 'processing', label: 'В обработке' },
-            { value: 'preparing', label: 'Готовится' },
-            { value: 'delivering', label: 'Доставляется' },
-            { value: 'completed', label: 'Завершён' },
-          ]}
-        />
+      <div className={styles.filterSection}>
+        <div className={styles.fliterItem}>
+          <label>Фильтр по статусу:</label>
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            size="medium"
+            options={[
+              { value: '', label: 'Все' },
+              { value: 'processing', label: 'В обработке' },
+              { value: 'preparing', label: 'Готовится' },
+              { value: 'delivering', label: 'Доставляется' },
+              { value: 'completed', label: 'Завершён' },
+            ]}
+          />
+        </div>
       </div>
 
       {loading ? (

@@ -64,13 +64,16 @@ const Input = ({
   })();
 
   const renderInput = () => {
+    // добавляем * в плейсхолдер, если поле required
+    const requiredPlaceholder = required ? `${placeholder}*` : placeholder;
+
     if (isText) {
       return (
         <textarea
           ref={inputRef}
           value={value}
           onChange={handleChange}
-          placeholder={placeholder}
+          placeholder={requiredPlaceholder}
           className={`${styles.input} ${widthClass} ${styles.textarea} ${className}`}
           maxLength={5000}
           style={{ height: 'auto' }}
@@ -86,7 +89,7 @@ const Input = ({
             type="tel"
             value={value || '(___)-___-__-__'}
             onChange={handleChange}
-            placeholder="(___)-___-__-__"
+            placeholder={requiredPlaceholder || '(___)-___-__-__'}
             className={`${styles.input} ${widthClass}`}
             required={required}
           />
@@ -99,7 +102,7 @@ const Input = ({
           type={type}
           value={value}
           onChange={handleChange}
-          placeholder={placeholder}
+          placeholder={requiredPlaceholder}
           className={`${styles.input} ${widthClass} ${className}`}
           required={required}
         />
@@ -110,7 +113,6 @@ const Input = ({
   return (
     <div className={labelTop ? styles.wrapperVertical : styles.wrapper}>
       {renderInput()}
-      {required && <span className={styles.requiredIndicator}>*</span>}
     </div>
   );
 };

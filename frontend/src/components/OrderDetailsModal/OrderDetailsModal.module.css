@@ -1,62 +1,137 @@
 .backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 .modal {
-  background: var(--color-bg);
-  width: min(900px, 92vw);
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  position: relative;
-  padding: 20px;
+    background: var(--color-bg);
+    width: min(700px, 90vw);
+    /* уже */
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    position: relative;
+    padding: 20px 24px;
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 .close {
-  position: absolute;
-  right: 10px;
-  top: 6px;
-  border: none;
-  background: transparent;
-  font-size: 28px;
-  cursor: pointer;
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--color-muted);
 }
 
 .header {
-  margin-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
 }
 
 .title {
-  margin: 0;
-  color: var(--color-blue);
-  font-size: 24px;
-  font-weight: 600;
+    margin: 0;
+    color: var(--color-blue);
+    font-size: 26px;
+    font-weight: 600;
 }
 
 .meta {
-  margin: 4px 0 12px 0;
-  color: var(--color-muted);
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--color-muted);
+}
+
+.status {
+    font-weight: 600;
+    color: var(--color-blue-dark);
 }
 
 .info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 0 auto;
+    /* центрируем блок по горизонтали */
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding: 4px 8px;
+    /* аккуратные строки */
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.commentRow {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--color-border);
+    padding: 4px 8px;
+    /* аккуратные строки */
+    border-radius: 4px;
+    font-size: 16px;
+    justify-content: space-between;
+}
+
+.subtitle {
+    margin: 12px 0 6px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-blue);
+    text-align: center;
+    /* по центру */
+}
+
+.tableWrapper {
+    margin-top: 4px;
+    display: flex;
+    justify-content: center;
+    /* таблица по центру */
 }
 
 .priceLabel {
-  color: var(--color-blue);
-  font-weight: 500;
-  font-size: 20px;
-  margin-top: 12px;
+    text-align: center;
+    /* сумма тоже по центру */
+    color: var(--color-blue);
+    font-weight: 500;
+    font-size: 18px;
+    margin-top: 12px;
 }
 
 .price {
-  font-weight: 900;
-  color: var(--color-blue-dark);
+    font-weight: 900;
+    color: var(--color-blue-dark);
+}
+
+.label {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.comment {
+  display: block;              /* вместо flex, чтобы текст нормально обтекал */
+  min-height: 20px;
+  max-height: 50px;            /* можно чуть больше, чем 50px */
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;       /* перенос по словам */
+  white-space: pre-wrap;       /* перенос строк, учитывает \n */
+  padding: 6px 8px;
+  line-height: 1.4;            /* приятнее для многострочного текста */
+  background-color: var(--color-bg-muted);
+  border-radius: 4px;
+  font-size: 16px;
 }

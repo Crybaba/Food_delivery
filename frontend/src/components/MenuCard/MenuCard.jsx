@@ -3,7 +3,7 @@ import Button from '../Button/Button';
 import styles from './MenuCard.module.css';
 import OrderDetailsModal from '../DishDetailsModal/DishDetailsModal';
 
-const MenuCard = ({ title, image, price, description, calories, onAddToCart, dish }) => {
+const MenuCard = ({ title, image, price, description, weight, calories, onAddToCart, dish }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,7 +28,10 @@ const MenuCard = ({ title, image, price, description, calories, onAddToCart, dis
         <div className={styles.metaRow}>
           <div className={styles.priceBadge}>{price} ₽</div>
           <div className={styles.calories}>
-            Калорийность: <span className={styles.caloriesValue}>{calories}</span>
+            Калорийность: <span className={styles.caloriesValue}>{calories} ккал </span>
+          </div>
+          <div className={styles.calories}>
+            Вес: <span className={styles.caloriesValue}>{weight} г.</span>
           </div>
         </div>
 

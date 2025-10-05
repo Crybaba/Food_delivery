@@ -65,6 +65,7 @@ export default function ClientMenuPage() {
               image={dish.image}
               price={dish.price}
               description={dish.description}
+              weight={dish.weight}
               calories={dish.calories}
               dish={dish}
               onAddToCart={(qty = 1) => handleAddToCart(dish, qty)}

@@ -56,18 +56,16 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         legend="* — обязательно для заполнения"
       >
-        {/* Ссылка отдельно, вне грида */}
-        <div className={`${styles.loginLink} ${styles.fullWidth}`}>
+        <div className={styles['login-link']}>
           <span className={styles['login-link-label']}>Впервые у нас? </span>
           <Link to="/register" className={styles['login-link-text']}>
             Зарегистрироваться
           </Link>
         </div>
 
-        {/* Грид только для полей ввода */}
-        <div className={styles.formGrid}>
-          <div className={styles.formRow}>
-            <label htmlFor="phone">Телефон:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="phone">Телефон:</label>
+          <div className={styles.rowInput}>
             <Input
               id="phone"
               isPhone
@@ -77,9 +75,11 @@ export default function LoginPage() {
               required
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="password">Пароль:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="password">Пароль:</label>
+          <div className={styles.rowInput}>
             <Input
               id="password"
               type="password"
@@ -92,8 +92,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Кнопка отдельно, не внутри грида */}
-        <Button type="submit" text="Вход" className={styles.formSubmit} />
+        <Button type="submit" text="Вход" />
       </FormWrapper>
     </Layout>
   );

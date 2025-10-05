@@ -82,9 +82,9 @@ export default function RegisterPage() {
         </div>
 
         {/* Грид для всех полей */}
-        <div className={styles.formGrid}>
-          <div className={styles.formRow}>
-            <label htmlFor="surname">Фамилия:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="surname">Фамилия:</label>
+          <div className={styles.rowInput}>
             <Input
               id="surname"
               value={surname}
@@ -94,9 +94,11 @@ export default function RegisterPage() {
               required
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="name">Имя:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="name">Имя:</label>
+          <div className={styles.rowInput}>
             <Input
               id="name"
               value={name}
@@ -106,9 +108,11 @@ export default function RegisterPage() {
               required
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="patronymic">Отчество:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="patronymic">Отчество:</label>
+          <div className={styles.rowInput}>
             <Input
               id="patronymic"
               value={patronymic}
@@ -117,9 +121,11 @@ export default function RegisterPage() {
               placeholder="Введите отчество"
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="phone">Телефон:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="phone">Телефон:</label>
+          <div className={styles.rowInput}>
             <Input
               id="phone"
               value={phone}
@@ -130,9 +136,11 @@ export default function RegisterPage() {
               required
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="password">Пароль:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="password">Пароль:</label>
+          <div className={styles.rowInput}>
             <Input
               id="password"
               type="password"
@@ -142,9 +150,11 @@ export default function RegisterPage() {
               required
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="confirmPassword">Повторите пароль:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="confirmPassword">Повторите пароль:</label>
+          <div className={styles.rowInput}>
             <Input
               id="confirmPassword"
               type="password"
@@ -154,9 +164,11 @@ export default function RegisterPage() {
               required
             />
           </div>
+        </div>
 
-          <div className={styles.formRow}>
-            <label htmlFor="gender">Пол:</label>
+        <div className={styles.formRow}>
+          <label htmlFor="gender">Пол:</label>
+          <div>
             <Select
               id="gender"
               value={gender}

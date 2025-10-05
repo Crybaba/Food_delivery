@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './OrderDetailsModal.module.css';
 import Table from '../Table/Table';
+import Button from '../Button/Button';
+import Select from '../Select/Select';
+import { useAuth } from '../../context/AuthContext';
 
-export default function OrderDetailsModal({ order, onClose }) {
+export default function OrderDetailsModal({ order, onClose, couriers = [], orders = [], onAssignCourier }) {
+  const { role } = useAuth();
+
+  const [selectedCourier, setSelectedCourier] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+
+  useEffect(() => {
+    if (order) {
+      setSelectedCourier(order.courier?.toString() || '');
+      setSelectedStatus(order.status || '');
+    }
+  }, [order]);
+
   if (!order) return null;
 
   const columns = [
@@ -12,38 +27,96 @@ export default function OrderDetailsModal({ order, onClose }) {
     { key: 'sum', label: 'Сумма, ₽', align: 'right', width: '120px' }
   ];
 
-  const data = order.items.map((item, idx) => ({
-    dish: item.dish_name || item.dish,
+  const data = order.items.map(item => ({
+    dish: item.dish?.name || '—',
     quantity: item.quantity,
     price: item.price || 0,
-    sum: ((Number(item.price) || 0) * item.quantity).toFixed(2)
+    sum: ((Number(item.price) || 0) * item.quantity).toFixed(2),
   }));
 
   const total = data.reduce((acc, item) => acc + Number(item.sum), 0).toFixed(2);
 
+  const statusOptions = [
+    { value: 'processing', label: 'В обработке' },
+    { value: 'preparing', label: 'Готовится' },
+    { value: 'delivering', label: 'Доставляется' },
+    { value: 'completed', label: 'Завершён' },
+  ];
+
+  const courierOptions = [
+    { value: '', label: 'Не назначен' },
+    ...couriers.map(c => {
+      const unfinishedCount = orders.filter(
+        o => o.courier === c.id && o.status !== 'completed'
+      ).length;
+      return {
+        value: c.id.toString(),
+        label: `${c.surname || ''} ${c.name || ''}${c.patronymic ? ' ' + c.patronymic : ''} (${unfinishedCount} активно)`
+      };
+    })
+  ];
+
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <button className={styles.close} onClick={onClose}>&times;</button>
 
         <div className={styles.header}>
           <h2 className={styles.title}>Заказ #{order.id}</h2>
-          <p className={styles.meta}>Статус: {order.status}</p>
+          <p className={styles.meta}>
+            Статус:{' '}
+            {role === 'ADMIN' ? (
+              <Select
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                options={statusOptions}
+                size="small"
+              />
+            ) : (
+              <span className={styles.status}>{order.status}</span>
+            )}
+          </p>
         </div>
 
         <div className={styles.info}>
-          <p><strong>Адрес:</strong> {order.pickup ? 'Самовывоз' : `${order.street}, ${order.house}, кв.${order.flat}`}</p>
-          <p><strong>Телефон:</strong> {order.phone}</p>
-          <p><strong>Курьер:</strong> {order.courier || 'Не назначен'}</p>
-          <p><strong>Комментарий:</strong> {order.comment || '-'}</p>
+          <div className={styles.infoRow}>
+            <span className={styles.label}>Адрес:</span>
+            <span>{order.pickup ? 'Самовывоз' : `${order.street}, ${order.house}, кв.${order.flat}`}</span>
+          </div>
 
-          <h3>Состав заказа:</h3>
-          <Table columns={columns} data={data} />
+          <div className={styles.infoRow}>
+            <span className={styles.label}>Телефон:</span>
+            <span>+7{order.phone}</span>
+          </div>
 
-          <p className={styles.priceLabel}>
-            Итого: <span className={styles.price}>{total} ₽</span>
-          </p>
+          <div className={styles.infoRow}>
+            <span className={styles.label}>Курьер:</span>
+            {role === 'ADMIN' ? (
+              <Select
+                value={selectedCourier}
+                onChange={setSelectedCourier}
+                options={courierOptions}
+                size="long"
+              />
+            ) : (
+              <span>{order.courier ? `${order.courier.surname} ${order.courier.name}` : '—'}</span>
+            )}
+          </div>
         </div>
+
+        <Table columns={columns} data={data} />
+
+        <div className={styles.total}>
+          <strong>Итого: {total} ₽</strong>
+        </div>
+
+        {role === 'ADMIN' && (
+          <Button
+            text="Сохранить"
+            color="orange"
+            onClick={() => onAssignCourier(order.id, selectedCourier, selectedStatus)}
+          />
+        )}
       </div>
     </div>
   );

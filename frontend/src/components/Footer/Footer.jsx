@@ -23,6 +23,7 @@ export default function Footer() {
         <div className={styles.footerRight}>
           <p>Часы работы</p>
           <p>10:00 – 21:00; Пн – Вс</p>
+          <p>+7(000)-000-00-00</p>
         </div>
       </div>
     </footer>

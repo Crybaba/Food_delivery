@@ -1,40 +1,19 @@
-.formGrid {
-  display: grid;
-  grid-template-columns: 1fr; /* по умолчанию одна колонка */
-  gap: 12px; /* расстояние между строками */
-  margin-top: 16px;
-  max-width: 500px; /* ограничение ширины формы */
-}
-
 .formRow {
-  display: grid;
-  grid-template-columns: 140px 1fr; /* label + поле */
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: left;
+  width: auto;
+  gap: 5px;
 }
 
 .formRow label {
   text-align: right;
   font-weight: 600;
-  white-space: normal;
-  word-break: break-word;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  width: 150px;
 }
 
-.addressSubRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px; /* минимальное расстояние между элементами */
-  flex-wrap: nowrap; /* запрет переноса */
-}
-
-.addressSubRow label {
-  width: auto; /* метки по ширине контента */
-  text-align: right;
-  font-weight: 600;
-  white-space: nowrap; /* текст метки не переносится */
-}
-
-.addressSubRow input {
-  flex: 0 0 auto; /* инпуты не растягиваются */
+.rowInput {
+  width: 300px;
 }

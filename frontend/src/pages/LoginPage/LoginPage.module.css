@@ -1,38 +1,27 @@
-.formGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px; /* расстояние между строками */
-  margin-top: 16px;
-  max-width: 400px; /* ограничивает ширину только полей */
-}
-
 .formRow {
   display: flex;
   align-items: center;
-  gap: 12px; /* расстояние между меткой и полем */
+  justify-content: left;
+  gap: 5px;
 }
 
 .formRow label {
-  width: 120px; /* фиксированная ширина метки */
   text-align: right;
   font-weight: 600;
-  white-space: nowrap;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  width: 100px;
 }
 
-.formRow input,
-.formRow textarea,
-.formRow .phoneWrapper {
-  flex: 1; /* поле растягивается на остаток строки */
-}
-
-.fullWidth {
-  width: 100%; /* для ссылки, кнопки, других блоков */
+.rowInput {
+  width: 200px;
 }
 
 .login-link {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 16px;
+  width: 350px;
 }
