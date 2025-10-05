@@ -174,7 +174,7 @@ export default function AdminCouriersPage() {
                 {/* добавление курьера */}
                 <FormWrapper
                     onSubmit={handleAddCourier}
-                    legend="* — обязательно для заполнения"
+                    legend=""
                 >
                     <div className={styles.formItem}>
                         <label htmlFor="phone">Телефон:</label>

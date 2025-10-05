@@ -225,6 +225,7 @@ export default function AdminAnalyticsPage() {
                         <Select
                             value={chartType}
                             onChange={setChartType}
+                            size='long'
                             options={[
                                 { value: 'popularity', label: 'Популярность блюд' },
                                 { value: 'countByDay', label: 'Кол-во заказов за период' },
