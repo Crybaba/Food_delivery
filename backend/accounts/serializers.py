@@ -1,6 +1,7 @@
+#accounts/seriali
 from rest_framework import serializers
 from .models import User, Cart, CartItem
-from menu.models import Dish  # <-- у тебя блюда в приложении menu
+from menu.models import Dish
 
 
 # Сериализаторы пользователей
