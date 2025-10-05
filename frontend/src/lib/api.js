@@ -196,10 +196,16 @@ export async function fetchOrderDetails(orderId) {
   }).then(res => res.json());
 }
 
-export async function fetchAdminOrders(courierId = "") {
-  const url = new URL(`${BASE_URL}/orders/admin/`);
-  if (courierId) url.searchParams.append('courier', courierId);
-  return fetch(url.toString(), { credentials: 'include' }).then(res => res.json());
+export async function fetchAdminOrders() {
+    let orders = [];
+    let url = `${BASE_URL}/orders/admin/`;
+    while (url) {
+        const res = await fetch(url, { credentials: 'include' });
+        const data = await res.json();
+        orders = orders.concat(data.results);
+        url = data.next; // ссылка на следующую страницу
+    }
+    return orders;
 }
 
 export async function fetchCouriers() {

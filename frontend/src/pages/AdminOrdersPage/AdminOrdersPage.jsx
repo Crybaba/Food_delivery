@@ -29,16 +29,14 @@ export default function AdminOrdersPage() {
             setLoading(true);
             try {
                 const [ordersData, couriersData] = await Promise.all([
-                    fetchAdminOrders(),
+                    fetchAdminOrders(),  // теперь все заказы
                     fetchCouriers(),
                 ]);
 
-                const ordersWithCourier = (ordersData.results || []).map(order => ({
+                setOrders(ordersData.map(order => ({
                     ...order,
                     courier: order.courier || null,
-                }));
-
-                setOrders(ordersWithCourier);
+                })));
                 setCouriers(couriersData || []);
             } catch (err) {
                 console.error(err);

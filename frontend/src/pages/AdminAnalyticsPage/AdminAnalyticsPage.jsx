@@ -51,8 +51,8 @@ export default function AdminAnalyticsPage() {
         async function loadData() {
             setLoading(true);
             try {
-                const data = await fetchAdminOrders();
-                setOrders(data.results || []);
+                const allOrders = await fetchAdminOrders();
+                setOrders(allOrders);
             } catch (err) {
                 console.error('Ошибка загрузки заказов:', err);
                 setOrders([]);
@@ -62,7 +62,6 @@ export default function AdminAnalyticsPage() {
         }
         loadData();
     }, []);
-
     useEffect(() => {
         if (!orders.length) return;
 
@@ -96,26 +95,32 @@ export default function AdminAnalyticsPage() {
             case 'countByDay': {
                 const map = {};
                 filtered.forEach(order => {
-                    const day = new Date(order.created_at).toLocaleDateString();
-                    map[day] = (map[day] || 0) + 1;
+                    const day = new Date(order.created_at);
+                    const dayStr = day.toISOString().slice(0, 10); // "2025-09-17"
+                    map[dayStr] = (map[dayStr] || 0) + 1;
                 });
-                data = Object.entries(map).map(([day, count]) => ({ day, count }));
+                data = Object.entries(map)
+                    .map(([day, count]) => ({ day, count }))
+                    .sort((a, b) => new Date(a.day) - new Date(b.day));
                 break;
             }
 
             case 'avgByDay': {
                 const map = {};
                 filtered.forEach(order => {
-                    const day = new Date(order.created_at).toLocaleDateString();
+                    const day = new Date(order.created_at);
+                    const dayStr = day.toISOString().slice(0, 10); // "2025-09-17"
                     const total = order.items.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0);
-                    if (!map[day]) map[day] = { sum: 0, count: 0 };
-                    map[day].sum += total;
-                    map[day].count += 1;
+                    if (!map[dayStr]) map[dayStr] = { sum: 0, count: 0 };
+                    map[dayStr].sum += total;
+                    map[dayStr].count += 1;
                 });
-                data = Object.entries(map).map(([day, { sum, count }]) => ({
-                    day,
-                    avg: (sum / count).toFixed(2)
-                }));
+                data = Object.entries(map)
+                    .map(([day, { sum, count }]) => ({
+                        day,
+                        avg: (sum / count).toFixed(2)
+                    }))
+                    .sort((a, b) => new Date(a.day) - new Date(b.day));
                 break;
             }
 
@@ -162,8 +167,8 @@ export default function AdminAnalyticsPage() {
                 filtered.forEach(order => {
                     const raw = (order.user_gender || '').toLowerCase();
                     let gender = 'unknown';
-                    if (raw === 'м' || raw === 'male') gender = 'male';
-                    else if (raw === 'ж' || raw === 'female') gender = 'female';
+                    if (raw === "м" || raw === 'male') gender = 'male';
+                    else if (raw === "ж" || raw === 'female') gender = 'female';
                     map[gender]++;
                 });
                 data = [
@@ -173,7 +178,6 @@ export default function AdminAnalyticsPage() {
                 ];
                 break;
             }
-
             case 'byWeekday': {
                 const map = { Пн: 0, Вт: 0, Ср: 0, Чт: 0, Пт: 0, Сб: 0, Вс: 0 };
                 filtered.forEach(o => {
