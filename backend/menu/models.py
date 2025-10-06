@@ -1,27 +1,6 @@
 from django.db import models
 
 class Dish(models.Model):
-    CATEGORY_CHOICES = [
-        ('hot', 'Горячее'),
-        ('japan', 'Япония'),
-        ('china', 'Китай'),
-        ('snack', 'Закуски'),
-        ('drink', 'Напитки'),
-        ('dessert', 'Десерты'),
-        ('other', 'Другое'),
-    ]
-
-    name = models.CharField(max_length=100, verbose_name="Название блюда")
-    description = models.TextField(verbose_name="Описание")
-    price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Цена")
-    weight = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Вес (г)")
-    calories = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Калории")
-    image = models.ImageField(upload_to='dishes/', verbose_name="Изображение", blank=True, null=True)
-    is_available = models.BooleanField(default=True, verbose_name="Доступно")
-
-from django.db import models
-
-class Dish(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название блюда")
     description = models.TextField(verbose_name="Описание")
     price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Цена")
