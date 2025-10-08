@@ -13,7 +13,7 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
 
   useEffect(() => {
     if (order) {
-      setSelectedCourier(order.courier?.toString() || '');
+      setSelectedCourier(order.courier?.id?.toString() || order.courier?.toString() || '');
       setSelectedStatus(order.status || '');
     }
   }, [order]);
@@ -55,6 +55,18 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
       };
     })
   ];
+
+  // Получаем текстовое имя курьера (если нужно просто отобразить)
+  const courierName = (() => {
+    if (!order.courier) return '—';
+    if (typeof order.courier === 'object') {
+      return `${order.courier.surname || ''} ${order.courier.name || ''}`.trim() || '—';
+    }
+    const courier = couriers.find(c => c.id === Number(order.courier));
+    return courier
+      ? `${courier.surname || ''} ${courier.name || ''}`.trim() || '—'
+      : '—';
+  })();
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
@@ -99,9 +111,16 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
                 size="long"
               />
             ) : (
-              <span>{order.courier ? `${order.courier.surname} ${order.courier.name}` : '—'}</span>
+              <span>{courierName}</span>
             )}
           </div>
+
+          {order.comment && (
+            <div className={styles.commentRow}>
+              <span className={styles.label}>Комментарий:</span>
+              <span>{order.comment}</span>
+            </div>
+          )}
         </div>
 
         <Table columns={columns} data={data} />
