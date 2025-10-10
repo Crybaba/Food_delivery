@@ -100,14 +100,16 @@ export default function AdminOrdersPage() {
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
-    const columns = [
+     const columns = [
         { key: 'id', label: 'ID', width: '80px', align: 'center' },
         { key: 'user_name', label: 'ФИО клиента', width: '200px' },
+        { key: 'user_phone', label: 'Телефон', width: '150px' }, 
         { key: 'courier_name', label: 'ФИО курьера', width: '200px' },
         { key: 'created_at', label: 'Дата', width: '180px' },
         { key: 'total', label: 'Сумма, ₽', width: '120px', align: 'right' },
         { key: 'status', label: 'Статус', width: '150px' },
     ];
+
 
     const statusMap = {
         processing: 'В обработке',
@@ -117,7 +119,7 @@ export default function AdminOrdersPage() {
         cancelled: 'Отменён',
     };
 
-    const data = filteredOrders.map(order => ({
+     const data = filteredOrders.map(order => ({
         id: (
             <button
                 className={styles.orderIdButton}
@@ -127,6 +129,7 @@ export default function AdminOrdersPage() {
             </button>
         ),
         user_name: order.user_name,
+        user_phone: order.phone || '—',
         courier_name: order.courier_name || '—',
         created_at: new Date(order.created_at).toLocaleString(),
         total: order.items

@@ -13,7 +13,10 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
 
   useEffect(() => {
     if (order) {
-      setSelectedCourier(order.courier?.id?.toString() || order.courier?.toString() || '');
+      // Если courier — число (ID), приводим к строке
+      setSelectedCourier(
+        order.courier ? order.courier.toString() : ''
+      );
       setSelectedStatus(order.status || '');
     }
   }, [order]);
@@ -56,16 +59,13 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
     })
   ];
 
-  // Получаем текстовое имя курьера (если нужно просто отобразить)
+  // 🧩 Получаем имя курьера для отображения
   const courierName = (() => {
-    if (!order.courier) return '—';
-    if (typeof order.courier === 'object') {
-      return `${order.courier.surname || ''} ${order.courier.name || ''}`.trim() || '—';
-    }
+    if (order.courier_name) return order.courier_name;
     const courier = couriers.find(c => c.id === Number(order.courier));
-    return courier
-      ? `${courier.surname || ''} ${courier.name || ''}`.trim() || '—'
-      : '—';
+    if (courier)
+      return `${courier.surname || ''} ${courier.name || ''}`.trim() || '—';
+    return '—';
   })();
 
   return (
@@ -93,7 +93,11 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
         <div className={styles.info}>
           <div className={styles.infoRow}>
             <span className={styles.label}>Адрес:</span>
-            <span>{order.pickup ? 'Самовывоз' : `${order.street}, ${order.house}, кв.${order.flat}`}</span>
+            <span>
+              {order.pickup
+                ? 'Самовывоз'
+                : `${order.street}, ${order.house}, кв.${order.flat}`}
+            </span>
           </div>
 
           <div className={styles.infoRow}>
@@ -133,7 +137,9 @@ export default function OrderDetailsModal({ order, onClose, couriers = [], order
           <Button
             text="Сохранить"
             color="orange"
-            onClick={() => onAssignCourier(order.id, selectedCourier, selectedStatus)}
+            onClick={() =>
+              onAssignCourier(order.id, selectedCourier, selectedStatus)
+            }
           />
         )}
       </div>

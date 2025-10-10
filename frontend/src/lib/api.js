@@ -10,7 +10,7 @@ function getCsrfToken() {
 }
 
 /**
- * Проверяем наличие CSRF-токена через эндпоинт /csrf/
+ * Обеспечиваем наличие CSRF токена через эндпоинт /csrf/
  */
 async function ensureCsrf() {
   if (!getCsrfToken()) {
@@ -19,7 +19,7 @@ async function ensureCsrf() {
 }
 
 /**
- * Универсальный fetch с CSRF и авторизацией по сессии
+ * Универсальный fetch с CSRF и сессиями
  */
 export async function fetchWithCsrf(url, options = {}) {
   const res = await fetch(url, {
@@ -36,7 +36,7 @@ export async function fetchWithCsrf(url, options = {}) {
   try {
     const text = await res.text();
     if (text) data = JSON.parse(text);
-  } catch {
+  } catch (e) {
     data = null;
   }
 
@@ -44,32 +44,16 @@ export async function fetchWithCsrf(url, options = {}) {
   return data;
 }
 
-/**
- * Утилита для загрузки всех страниц пагинации
- */
-async function fetchAllPaginated(url) {
-  let all = [];
-  while (url) {
-    const resp = await fetchWithCsrf(url, { method: 'GET' });
-    if (resp.results) {
-      all = all.concat(resp.results);
-      url = resp.next;
-    } else {
-      // если пагинации нет
-      return resp;
-    }
-  }
-  return all;
-}
-
-// ----------------------
-// Пользователи и аутентификация
-// ----------------------
-
+// -----------------
+// Текущий пользователь
+// -----------------
 export async function fetchCurrentUser() {
   return fetchWithCsrf(`${BASE_URL}/accounts/me/`, { method: 'GET' });
 }
 
+// -----------------
+// Аутентификация
+// -----------------
 export async function loginUser({ phone, password }) {
   await ensureCsrf();
   const res = await fetch(`${BASE_URL}/accounts/login/`, {
@@ -79,11 +63,12 @@ export async function loginUser({ phone, password }) {
       'Content-Type': 'application/json',
       'X-CSRFToken': getCsrfToken(),
     },
-    credentials: 'include',
+    credentials: 'include', // <-- обязательно
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
 
 export async function registerUser({ surname, name, patronymic, phone, password, gender }) {
   await ensureCsrf();
@@ -98,10 +83,9 @@ export async function logoutUser() {
   return fetchWithCsrf(`${BASE_URL}/accounts/logout/`, { method: 'POST' });
 }
 
-// ----------------------
+// -----------------
 // Корзина
-// ----------------------
-
+// -----------------
 export async function fetchCart() {
   return fetchWithCsrf(`${BASE_URL}/accounts/cart/`, { method: 'GET' });
 }
@@ -109,14 +93,14 @@ export async function fetchCart() {
 export async function addToCart(dish_id, quantity = 1) {
   return fetchWithCsrf(`${BASE_URL}/accounts/cart/add/`, {
     method: 'POST',
-    body: JSON.stringify({ dish_id, quantity }),
+    body: JSON.stringify({ dish_id, quantity })
   });
 }
 
 export async function removeFromCart(dish_id, quantity = 1) {
   return fetchWithCsrf(`${BASE_URL}/accounts/cart/remove/`, {
     method: 'POST',
-    body: JSON.stringify({ dish_id, quantity }),
+    body: JSON.stringify({ dish_id, quantity })
   });
 }
 
@@ -124,13 +108,21 @@ export async function clearCart() {
   return fetchWithCsrf(`${BASE_URL}/accounts/cart/clear/`, { method: 'POST' });
 }
 
-// ----------------------
-// Блюда (учёт пагинации)
-// ----------------------
-
+// -----------------
+// Блюда (с CSRF)
+// -----------------
 export async function fetchDishes() {
-  const url = `${BASE_URL}/menu/dishes/?is_available=true&ordering=name`;
-  return fetchAllPaginated(url);
+  // GET запрос можно делать напрямую через fetchWithCsrf для единообразия
+  let url = `${BASE_URL}/menu/dishes/?is_available=true&ordering=name`;
+  let all = [];
+
+  while (url) {
+    const resp = await fetchWithCsrf(url, { method: 'GET' });
+    all = all.concat(resp.results || []);
+    url = resp.next; // если next есть, идём на следующую страницу
+  }
+
+  return all;
 }
 
 export async function createDish(formData) {
@@ -141,15 +133,17 @@ export async function createDish(formData) {
     credentials: 'include',
     headers: {
       'X-CSRFToken': getCsrfToken(),
-    },
+    }
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
 export async function deleteDish(id) {
-  await ensureCsrf();
-  return fetchWithCsrf(`${BASE_URL}/menu/dishes/${id}/`, { method: 'DELETE' });
+  await ensureCsrf(); // убедимся, что CSRF есть
+  return fetchWithCsrf(`${BASE_URL}/menu/dishes/${id}/`, {
+    method: 'DELETE'
+  });
 }
 
 export async function updateDish(id, formData) {
@@ -160,25 +154,25 @@ export async function updateDish(id, formData) {
     credentials: 'include',
     headers: {
       'X-CSRFToken': getCsrfToken(),
-    },
+    }
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
 
 export async function toggleDishAvailability(id) {
   await ensureCsrf();
   return fetchWithCsrf(`${BASE_URL}/menu/dishes/${id}/toggle_availability/`, { method: 'POST' });
 }
 
-// ----------------------
-// Заказы (универсальные, без админских ручек)
-// ----------------------
-
+// -----------------
+// Заказы
+// -----------------
 export async function createOrder(data) {
-  return fetchWithCsrf(`${BASE_URL}/orders/`, {
+  return fetchWithCsrf(`${BASE_URL}/orders/`, {  // <-- убрал лишнее "orders/"
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   });
 }
 
@@ -186,68 +180,109 @@ export async function fetchUserAddresses() {
   return fetchWithCsrf(`${BASE_URL}/orders/addresses/`, { method: 'GET' });
 }
 
-/**
- * Получение заказов текущего пользователя (с пагинацией)
- */
+// Получение всех заказов текущего пользователя
 export async function fetchUserOrders() {
-  const url = `${BASE_URL}/orders/`;
-  return fetchAllPaginated(url);
+  return fetch(`${BASE_URL}/orders/`, {
+    method: 'GET',
+    credentials: 'include', // если используется сессия
+  }).then(res => res.json());
 }
 
-/**
- * Получение деталей одного заказа
- */
+// Получение деталей конкретного заказа
 export async function fetchOrderDetails(orderId) {
-  return fetchWithCsrf(`${BASE_URL}/orders/${orderId}/`, { method: 'GET' });
+  return fetch(`${BASE_URL}/orders/${orderId}/`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(res => res.json());
 }
 
-/**
- * Обновление статуса заказа (для курьера/админа)
- */
-export async function updateOrderStatus(orderId, status) {
-  await ensureCsrf();
-  return fetchWithCsrf(`${BASE_URL}/orders/${orderId}/update_status/`, {
-    method: 'POST',
-    body: JSON.stringify({ status }),
-  });
+export async function fetchAdminOrders() {
+    let orders = [];
+    let url = `${BASE_URL}/orders/admin/`;
+    while (url) {
+        const res = await fetch(url, { credentials: 'include' });
+        const data = await res.json();
+        orders = orders.concat(data.results);
+        url = data.next; // ссылка на следующую страницу
+    }
+    return orders;
 }
 
+export async function fetchCouriers() {
+  return fetch(`${BASE_URL}/orders/couriers/`, { credentials: 'include' }).then(res => res.json());
+}
+
+// -----------------
+// Заказы (обновление)
+// -----------------
+
 /**
- * Назначение курьера (только админ)
+ * Назначение курьера на заказ
+ * @param {number} orderId
+ * @param {number|string} courierId
  */
 export async function assignCourier(orderId, courierId) {
   await ensureCsrf();
   return fetchWithCsrf(`${BASE_URL}/orders/${orderId}/assign_courier/`, {
     method: 'POST',
-    body: JSON.stringify({ courier_id: courierId }),
+    body: JSON.stringify({ courier_id: courierId })
   });
 }
 
-// ----------------------
-// Курьеры (только админ)
-// ----------------------
+/**
+ * Изменение статуса заказа
+ * @param {number} orderId
+ * @param {string} status
+ */
+export async function updateOrderStatus(orderId, status) {
+  await ensureCsrf();
+  return fetchWithCsrf(`${BASE_URL}/orders/${orderId}/update_status/`, {
+    method: 'POST',
+    body: JSON.stringify({ status })
+  });
+}
 
+// -----------------
+// Курьеры (админ)
+// -----------------
+
+/**
+ * Получить всех пользователей (для проверки телефона при добавлении курьера)
+ */
 export async function fetchAllUsers() {
   return fetchWithCsrf(`${BASE_URL}/accounts/users/`, { method: 'GET' });
 }
 
+/**
+ * Назначить пользователю роль курьера
+ * @param {string} phone — номер телефона существующего пользователя
+ */
 export async function addCourierByPhone(phone) {
   await ensureCsrf();
   return fetchWithCsrf(`${BASE_URL}/accounts/couriers/add/`, {
     method: 'POST',
-    body: JSON.stringify({ phone }),
+    body: JSON.stringify({ phone })
   });
 }
 
+/**
+ * Удалить курьера (меняет роль обратно на обычного пользователя)
+ * @param {number} courierId — ID пользователя/курьера
+ */
 export async function removeCourier(courierId) {
   await ensureCsrf();
   return fetchWithCsrf(`${BASE_URL}/accounts/couriers/${courierId}/remove/`, {
-    method: 'POST',
+    method: 'POST'
   });
 }
 
+/**
+ * Получить количество активных заказов у конкретного курьера
+ * (для проверки занятости)
+ * @param {number} courierId
+ */
 export async function fetchCourierActiveOrders(courierId) {
   return fetchWithCsrf(`${BASE_URL}/accounts/couriers/${courierId}/active_orders/`, {
-    method: 'GET',
+    method: 'GET'
   });
 }
